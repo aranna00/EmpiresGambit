@@ -34,10 +34,6 @@ namespace Terrain
             {
                 Triangulate(cell);
             }
-            
-            Console.WriteLine("vertices:" + _vertices.Count);
-            Console.WriteLine("colors:" + _colors.Count);
-            Console.WriteLine("triangles:" + _triangles.Count);
 
             _hexMesh.vertices = _vertices.ToArray();
             _hexMesh.colors = _colors.ToArray();
@@ -54,7 +50,8 @@ namespace Terrain
             }
         }
 
-        private void Triangulate (HexDirection direction, HexCell cell) {
+        private void Triangulate(HexDirection direction, HexCell cell)
+        {
             var center = cell.transform.localPosition;
             var v1 = center + HexMetrics.GetFirstSolidCorner(direction);
             var v2 = center + HexMetrics.GetSecondSolidCorner(direction);
@@ -62,21 +59,29 @@ namespace Terrain
             AddTriangle(center, v1, v2);
             AddTriangleColor(cell.color);
 
-            var v3 = center + HexMetrics.GetFirstCorner(direction);
-            var v4 = center + HexMetrics.GetSecondCorner(direction);
+            if (direction <= HexDirection.SE)
+            {
+                TriangulateConnection(direction, cell, v1, v2);
+            }
+        }
+
+        private void TriangulateConnection(HexDirection direction, HexCell cell, Vector3 v1, Vector3 v2)
+        {
+            var neighbor = cell.GetNeighbor(direction);
+            if (neighbor == null) return;
+
+            var bridge = HexMetrics.GetBridge(direction);
+            var v3 = v1 + bridge;
+            var v4 = v2 + bridge;
 
             AddQuad(v1, v2, v3, v4);
+            AddQuadColor(cell.color, neighbor.color);
 
-            var prevNeighbor = cell.GetNeighbor(direction.Previous()) ?? cell;
-            var neighbor = cell.GetNeighbor(direction) ?? cell;
-            var nextNeighbor = cell.GetNeighbor(direction.Next()) ?? cell;
-
-            AddQuadColor(
-                cell.color,
-                cell.color,
-                (cell.color + prevNeighbor.color + neighbor.color) / 3f,
-                (cell.color + neighbor.color + nextNeighbor.color) / 3f
-            );
+            var nextNeighbor = cell.GetNeighbor(direction.Next());
+            if (direction <= HexDirection.E && nextNeighbor != null) {
+                AddTriangle(v2, v4, v2 + HexMetrics.GetBridge(direction.Next()));
+                AddTriangleColor(cell.color, neighbor.color, nextNeighbor.color);
+            }
         }
 
         private void AddTriangle(Vector3 v1, Vector3 v2, Vector3 v3)
@@ -94,9 +99,19 @@ namespace Terrain
         private void AddTriangleColor(Color color)
         {
             _colors.Add(color);
+            _colors.Add(color);
+            _colors.Add(color);
         }
 
-        private void AddQuad (Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4) {
+        private void AddTriangleColor(Color cellColor, Color neighborColor, Color nextNeighborColor)
+        {
+            _colors.Add(cellColor);
+            _colors.Add(neighborColor);
+            _colors.Add(nextNeighborColor);
+        }
+
+        private void AddQuad(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4)
+        {
             var vertexIndex = _vertices.Count;
             _vertices.Add(v1);
             _vertices.Add(v2);
@@ -110,11 +125,12 @@ namespace Terrain
             _triangles.Add(vertexIndex + 3);
         }
 
-        private void AddQuadColor (Color c1, Color c2, Color c3, Color c4) {
+        private void AddQuadColor(Color c1, Color c2)
+        {
+            _colors.Add(c1);
             _colors.Add(c1);
             _colors.Add(c2);
-            _colors.Add(c3);
-            _colors.Add(c4);
+            _colors.Add(c2);
         }
     }
 }

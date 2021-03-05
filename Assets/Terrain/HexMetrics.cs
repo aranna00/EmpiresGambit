@@ -6,10 +6,10 @@ namespace Terrain
     {
         public const float OuterRadius = 10f;
         public const float InnerRadius = OuterRadius * 0.866025404f;
-        public const float solidFactor = 0.75f;
-        public const float blendFactor = 1f - solidFactor;
+        public const float SolidFactor = 0.75f;
+        public const float BlendFactor = 1f - SolidFactor;
 
-        public static Vector3[] corners =
+        public static readonly Vector3[] Corners =
         {
             new Vector3(0f, 0f, OuterRadius),
             new Vector3(InnerRadius, 0f, .5f * OuterRadius),
@@ -22,19 +22,27 @@ namespace Terrain
 
         public static Vector3 GetFirstCorner(HexDirection direction)
         {
-            return corners[(int)direction];
+            return Corners[(int) direction];
         }
 
         public static Vector3 GetSecondCorner(HexDirection direction)
         {
-            return corners[(int)direction + 1];
-        }
-        public static Vector3 GetFirstSolidCorner (HexDirection direction) {
-            return corners[(int)direction] * solidFactor;
+            return Corners[(int) direction + 1];
         }
 
-        public static Vector3 GetSecondSolidCorner (HexDirection direction) {
-            return corners[(int)direction + 1] * solidFactor;
+        public static Vector3 GetFirstSolidCorner(HexDirection direction)
+        {
+            return Corners[(int) direction] * SolidFactor;
+        }
+
+        public static Vector3 GetSecondSolidCorner(HexDirection direction)
+        {
+            return Corners[(int) direction + 1] * SolidFactor;
+        }
+
+        public static Vector3 GetBridge(HexDirection direction)
+        {
+            return (Corners[(int) direction] + Corners[(int) direction + 1]) * BlendFactor;
         }
     }
 }
