@@ -8,6 +8,7 @@ namespace Terrain
         public const float InnerRadius = OuterRadius * 0.866025404f;
         public const float SolidFactor = 0.75f;
         public const float BlendFactor = 1f - SolidFactor;
+        public const float ElevationsStep = 5f;
 
         public static readonly Vector3[] Corners =
         {

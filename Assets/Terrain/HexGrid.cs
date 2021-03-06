@@ -61,7 +61,8 @@ namespace Terrain
                 else
                 {
                     cell.SetNeighbor(HexDirection.SW, _cells[i - width]);
-                    if (x < width - 1) {
+                    if (x < width - 1)
+                    {
                         cell.SetNeighbor(HexDirection.SE, _cells[i - width + 1]);
                     }
                 }
@@ -71,6 +72,8 @@ namespace Terrain
             label.rectTransform.SetParent(_gridCanvas.transform, false);
             label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
             label.text = cell.coordinates.ToStringOnSeparateLines();
+
+            cell.uiRect = label.rectTransform;
         }
 
         private void Start()
@@ -78,14 +81,16 @@ namespace Terrain
             _hexMesh.Triangulate(_cells);
         }
 
-
-        public void ColorCell(Vector3 position, Color color)
+        public HexCell GetCell(Vector3 position)
         {
             position = transform.InverseTransformPoint(position);
             var coordinates = HexCoordinates.FromPosition(position);
             var index = coordinates.X + coordinates.Z * width + coordinates.Z / 2;
-            var cell = _cells[index];
-            cell.color = color;
+            return _cells[index];
+        }
+
+        public void Refresh()
+        {
             _hexMesh.Triangulate(_cells);
         }
     }
