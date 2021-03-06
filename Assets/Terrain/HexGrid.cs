@@ -10,6 +10,7 @@ namespace Terrain
         public HexCell cellPrefab;
         public Text cellLabelPrefab;
         public Color defaultColor = Color.white;
+        public Texture2D noiseSource;
 
         private HexCell[] _cells;
         private Canvas _gridCanvas;
@@ -17,6 +18,7 @@ namespace Terrain
 
         private void Awake()
         {
+            HexMetrics.NoiseSource = noiseSource;
             _gridCanvas = GetComponentInChildren<Canvas>();
             _hexMesh = GetComponentInChildren<HexMesh>();
             _cells = new HexCell[height * width];
@@ -28,6 +30,11 @@ namespace Terrain
                     CreateCell(x, z, i++);
                 }
             }
+        }
+
+        private void OnEnable()
+        {
+            HexMetrics.NoiseSource = noiseSource;
         }
 
         private void CreateCell(int x, int z, int i)
@@ -74,6 +81,7 @@ namespace Terrain
             label.text = cell.coordinates.ToStringOnSeparateLines();
 
             cell.uiRect = label.rectTransform;
+            cell.Elevation = 0;
         }
 
         private void Start()
