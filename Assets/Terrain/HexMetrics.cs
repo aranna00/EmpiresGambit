@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 namespace Terrain
 {
@@ -9,6 +12,10 @@ namespace Terrain
         public const float SolidFactor = 0.75f;
         public const float BlendFactor = 1f - SolidFactor;
         public const float ElevationsStep = 5f;
+        public const int TerracesPerSlope = 2;
+        public const int TerraceSteps = TerracesPerSlope * 2 + 1;
+        public const float HorizontalTerraceStepSize = 1f / TerraceSteps;
+        public const float VerticalTerraceStepSize = 1f / (TerracesPerSlope + 1);
 
         public static readonly Vector3[] Corners =
         {
@@ -44,6 +51,36 @@ namespace Terrain
         public static Vector3 GetBridge(HexDirection direction)
         {
             return (Corners[(int) direction] + Corners[(int) direction + 1]) * BlendFactor;
+        }
+
+        public static Vector3 TerraceLerp(Vector3 a, Vector3 b, int step)
+        {
+            var h = step * HorizontalTerraceStepSize;
+            a.x += (b.x - a.x) * h;
+            a.z += (b.z - a.z) * h;
+
+            var v = ((step + 1) / 2) * VerticalTerraceStepSize;
+            a.y += (b.y - a.y) * v;
+
+            return a;
+        }
+
+        public static Color TerraceLerp(Color a, Color b, int step)
+        {
+            var h = step * HorizontalTerraceStepSize;
+            return Color.Lerp(a, b, h);
+        }
+
+        public static HexEdgeType GetEdgeType(int elevation1, int elevation2)
+        {
+            var delta = Math.Abs(elevation2 - elevation1);
+            
+            if (delta==0)
+            {
+                return HexEdgeType.Flat;
+            }
+
+            return delta == 1 ? HexEdgeType.Slope : HexEdgeType.Cliff;
         }
     }
 }

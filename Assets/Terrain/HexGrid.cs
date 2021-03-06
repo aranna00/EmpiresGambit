@@ -5,8 +5,8 @@ namespace Terrain
 {
     public class HexGrid : MonoBehaviour
     {
-        public int width = 6;
-        public int height = 6;
+        public int width = 12;
+        public int height = 12;
         public HexCell cellPrefab;
         public Text cellLabelPrefab;
         public Color defaultColor = Color.white;

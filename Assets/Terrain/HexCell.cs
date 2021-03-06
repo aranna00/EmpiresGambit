@@ -35,5 +35,15 @@ namespace Terrain
         public HexCell GetNeighbor (HexDirection direction) {
             return neighbors[(int)direction];
         }
+
+        public HexEdgeType GETEdgeType(HexDirection direction)
+        {
+            return HexMetrics.GetEdgeType(_elevation, neighbors[(int) direction].Elevation);
+        }
+
+        public HexEdgeType GetEdgeType(HexCell otherCell)
+        {
+            return HexMetrics.GetEdgeType(_elevation, otherCell.Elevation);
+        }
     }
 }
