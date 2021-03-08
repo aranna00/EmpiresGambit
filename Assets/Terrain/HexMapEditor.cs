@@ -13,6 +13,10 @@ namespace Terrain
         private bool _applyColor;
         private bool _applyElevation = true;
         private int _brushSize;
+        private OptionalToggle _riverMode;
+        private bool _isDrag;
+        private HexDirection _dragDirection;
+        private HexCell _previousCell;
 
         private void Awake() {
             SelectColor(0);
@@ -23,14 +27,41 @@ namespace Terrain
                 !EventSystem.current.IsPointerOverGameObject()) {
                 HandleInput();
             }
+            else {
+                _previousCell = null;
+            }
         }
 
         private void HandleInput() {
             var inputRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(inputRay, out hit)) {
-                EditCells(hexGrid.GetCell(hit.point));
+            if (Physics.Raycast(inputRay, out var hit)) {
+                var currentCell = hexGrid.GetCell(hit.point);
+                if (_previousCell && _previousCell != currentCell) {
+                    ValidateDrag(currentCell);
+                }
+                else {
+                    _isDrag = false;
+                }
+                EditCells(currentCell);
+                _previousCell = currentCell;
             }
+            else {
+                _previousCell = null;
+            }
+        }
+
+        private void ValidateDrag (HexCell currentCell) {
+            for (
+                _dragDirection = HexDirection.NE;
+                _dragDirection <= HexDirection.NW;
+                _dragDirection++
+            ) {
+                if (_previousCell.GetNeighbor(_dragDirection) == currentCell) {
+                    _isDrag = true;
+                    return;
+                }
+            }
+            _isDrag = false;
         }
 
         private void EditCell(HexCell cell) {
@@ -42,6 +73,16 @@ namespace Terrain
 
             if (_applyElevation) {
                 cell.Elevation = _activeElevation;
+            }
+
+            if (_riverMode == OptionalToggle.No) {
+                cell.RemoveRiver();
+            }
+            else if (_isDrag && _riverMode == OptionalToggle.Yes) {
+                HexCell otherCell = cell.GetNeighbor(_dragDirection.Opposite());
+                if (otherCell) {
+                    otherCell.SetOutgoingRiver(_dragDirection);
+                }
             }
         }
 
@@ -84,5 +125,16 @@ namespace Terrain
         public void ShowUI(bool visible) {
             hexGrid.ShowUI(visible);
         }
+
+        public void SetRiverMode(int mode) {
+            _riverMode = (OptionalToggle) mode;
+        }
+    }
+
+    internal enum OptionalToggle
+    {
+        Ignore,
+        Yes,
+        No
     }
 }
