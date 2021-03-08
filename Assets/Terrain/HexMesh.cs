@@ -8,33 +8,59 @@ namespace Terrain
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class HexMesh : MonoBehaviour
     {
+        public bool useCollider, useColor, useUVCoordinates;
+
         private Mesh _hexMesh;
-        private static List<Vector3> _vertices = new List<Vector3>();
-        private static List<int> _triangles = new List<int>();
         private MeshCollider _meshCollider;
-        private static List<Color> _colors = new List<Color>();
+        
+        [NonSerialized] private List<Vector3> _vertices;
+        [NonSerialized] private List<int> _triangles;
+        [NonSerialized] private List<Color> _colors;
+        [NonSerialized] private List<Vector2> _uvs;
 
         private void Awake() {
             GetComponent<MeshFilter>().mesh = _hexMesh = new Mesh();
-            _meshCollider = gameObject.AddComponent<MeshCollider>();
+            if (useCollider) {
+                _meshCollider = gameObject.AddComponent<MeshCollider>();
+            }
+
             _hexMesh.name = "Hex Mesh";
         }
 
 
         public void Clear() {
             _hexMesh.Clear();
-            _vertices.Clear();
-            _triangles.Clear();
-            _colors.Clear();
+            _vertices = ListPool<Vector3>.Get();
+            _triangles = ListPool<int>.Get();
+            if (useColor) {
+                _colors = ListPool<Color>.Get();
+            }
+
+            if (useUVCoordinates) {
+                _uvs = ListPool<Vector2>.Get();
+            }
         }
 
         public void Apply() {
             {
                 _hexMesh.SetVertices(_vertices);
-                _hexMesh.SetColors(_colors);
+                ListPool<Vector3>.Add(_vertices);
                 _hexMesh.SetTriangles(_triangles, 0);
+                ListPool<int>.Add(_triangles);
+                if (useColor) {
+                    _hexMesh.SetColors(_colors);
+                    ListPool<Color>.Add(_colors);
+                }
+
+                if (useUVCoordinates) {
+                    _hexMesh.SetUVs(0, _uvs);
+                    ListPool<Vector2>.Add(_uvs);
+                }
+
                 _hexMesh.RecalculateNormals();
-                _meshCollider.sharedMesh = _hexMesh;
+                if (useCollider) {
+                    _meshCollider.sharedMesh = _hexMesh;
+                }
             }
         }
 
@@ -107,6 +133,19 @@ namespace Terrain
             _triangles.Add(vertexIndex);
             _triangles.Add(vertexIndex + 1);
             _triangles.Add(vertexIndex + 2);
+        }
+
+        public void AddTriangleUV(Vector2 uv1, Vector2 uv2, Vector2 uv3) {
+            _uvs.Add(uv1);
+            _uvs.Add(uv2);
+            _uvs.Add(uv3);
+        }
+
+        public void AddQuadUV(float uMin, float uMax, float vMin, float vMax) {
+            _uvs.Add(new Vector2(uMin,vMin));
+            _uvs.Add(new Vector2(uMax,vMin));
+            _uvs.Add(new Vector2(uMin,vMax));
+            _uvs.Add(new Vector2(uMax,vMax));
         }
     }
 }

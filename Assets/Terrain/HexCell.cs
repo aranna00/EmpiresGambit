@@ -53,6 +53,8 @@ namespace Terrain
             }
         }
 
+        public float RiverSurfaceY => (_elevation + HexMetrics.RiverSurfaceElevationOffset) * HexMetrics.ElevationsStep;
+
         [SerializeField] private HexCell[] neighbors;
         private int _elevation = int.MinValue;
         private Color _color;

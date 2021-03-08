@@ -18,7 +18,7 @@ namespace DefaultNamespace
             _stick = _swivel.GetChild(0);
         }
 
-        void Update () {
+        private void Update () {
             var zoomDelta = Input.GetAxis("Mouse ScrollWheel");
             if (zoomDelta != 0f) {
                 AdjustZoom(zoomDelta);
@@ -47,7 +47,7 @@ namespace DefaultNamespace
             transform.localRotation = Quaternion.Euler(0f, _rotationAngle, 0f);
         }
 
-        void AdjustPosition(float xDelta, float zDelta) {
+        private void AdjustPosition(float xDelta, float zDelta) {
             var direction = transform.localRotation *  new Vector3(xDelta, 0f, zDelta).normalized;
             var damping = Mathf.Max(Mathf.Abs(xDelta), Mathf.Abs(zDelta));
             var distance =
@@ -59,7 +59,7 @@ namespace DefaultNamespace
             transform.localPosition = ClampPosition(position);
         }
 
-        Vector3 ClampPosition (Vector3 position) {
+        private Vector3 ClampPosition (Vector3 position) {
             var xMax =
                 (grid.chunkCountX * HexMetrics.ChunkSizeX - 0.5f) *
                 (2f * HexMetrics.InnerRadius);

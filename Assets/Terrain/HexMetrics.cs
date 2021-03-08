@@ -14,14 +14,14 @@ namespace Terrain
         public const int TerraceSteps = TerracesPerSlope * 2 + 1;
         public const float HorizontalTerraceStepSize = 1f / TerraceSteps;
         public const float VerticalTerraceStepSize = 1f / (TerracesPerSlope + 1);
-        public const float CellPerturbStrength = 0f;
-        // public const float CellPerturbStrength = 4f;
+        public const float CellPerturbStrength = 4f;
         public const float NoiseScale = 0.003f;
         public const float ElevationPerturbStrength = 1.5f;
         public const int ChunkSizeX = 5, ChunkSizeZ = 5;
-        public const float StreamBedElevationOffset = -1f;
+        public const float StreamBedElevationOffset = -1.75f;
         public const float OuterToInner = .866025404f;
         public const float InnerToOuter = 1f / OuterToInner;
+        public const float RiverSurfaceElevationOffset = -.5f;
 
         public static Texture2D NoiseSource;
 
@@ -88,7 +88,7 @@ namespace Terrain
         public static Vector3 GetSolidEdgeMiddle(HexDirection direction) {
             return (Corners[(int) direction] + Corners[(int) direction + 1]) * (.5f * SolidFactor);
         }
-        
+
         public static Vector3 Perturb(Vector3 position) {
             var sample = SampleNoise(position);
 
