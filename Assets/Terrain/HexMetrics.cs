@@ -22,6 +22,7 @@ namespace Terrain
         public const float OuterToInner = .866025404f;
         public const float InnerToOuter = 1f / OuterToInner;
         public const float RiverSurfaceElevationOffset = -.5f;
+        public const int MaxSlopeHeight = 1;
 
         public static Texture2D NoiseSource;
 
@@ -78,7 +79,7 @@ namespace Terrain
                 return HexEdgeType.Flat;
             }
 
-            return delta == 1 ? HexEdgeType.Slope : HexEdgeType.Cliff;
+            return delta <= MaxSlopeHeight ? HexEdgeType.Slope : HexEdgeType.Cliff;
         }
 
         public static Vector4 SampleNoise(Vector3 position) {

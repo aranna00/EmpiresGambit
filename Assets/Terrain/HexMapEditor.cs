@@ -13,7 +13,7 @@ namespace Terrain
         private bool _applyColor;
         private bool _applyElevation = true;
         private int _brushSize;
-        private OptionalToggle _riverMode;
+        private OptionalToggle _riverMode, _roadMode;
         private bool _isDrag;
         private HexDirection _dragDirection;
         private HexCell _previousCell;
@@ -42,6 +42,7 @@ namespace Terrain
                 else {
                     _isDrag = false;
                 }
+
                 EditCells(currentCell);
                 _previousCell = currentCell;
             }
@@ -50,7 +51,7 @@ namespace Terrain
             }
         }
 
-        private void ValidateDrag (HexCell currentCell) {
+        private void ValidateDrag(HexCell currentCell) {
             for (
                 _dragDirection = HexDirection.NE;
                 _dragDirection <= HexDirection.NW;
@@ -61,6 +62,7 @@ namespace Terrain
                     return;
                 }
             }
+
             _isDrag = false;
         }
 
@@ -78,10 +80,21 @@ namespace Terrain
             if (_riverMode == OptionalToggle.No) {
                 cell.RemoveRiver();
             }
-            else if (_isDrag && _riverMode == OptionalToggle.Yes) {
-                HexCell otherCell = cell.GetNeighbor(_dragDirection.Opposite());
-                if (otherCell) {
+
+            if (_roadMode == OptionalToggle.No) {
+                cell.RemoveRoads();
+            }
+
+            else if (_isDrag) {
+                var otherCell = cell.GetNeighbor(_dragDirection.Opposite());
+                if (!otherCell) return;
+                
+                if (_riverMode == OptionalToggle.Yes) {
                     otherCell.SetOutgoingRiver(_dragDirection);
+                }
+
+                if (_roadMode == OptionalToggle.Yes) {
+                    otherCell.AddRoad(_dragDirection);
                 }
             }
         }
@@ -110,13 +123,13 @@ namespace Terrain
             var centerZ = center.coordinates.Z;
 
             for (int r = 0, z = centerZ - _brushSize; z <= centerZ; z++, r++) {
-                for (int x = centerX - r; x <= centerX + _brushSize; x++) {
+                for (var x = centerX - r; x <= centerX + _brushSize; x++) {
                     EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
                 }
             }
 
             for (int r = 0, z = centerZ + _brushSize; z > centerZ; z--, r++) {
-                for (int x = centerX - _brushSize; x <= centerX + r; x++) {
+                for (var x = centerX - _brushSize; x <= centerX + r; x++) {
                     EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
                 }
             }
@@ -128,6 +141,10 @@ namespace Terrain
 
         public void SetRiverMode(int mode) {
             _riverMode = (OptionalToggle) mode;
+        }
+
+        public void setRoadMode(int mode) {
+            _roadMode = (OptionalToggle) mode;
         }
     }
 

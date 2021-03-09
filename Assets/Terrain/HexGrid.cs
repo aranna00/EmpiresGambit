@@ -94,7 +94,7 @@ namespace Terrain
             _cells = new HexCell[_cellCountZ * _cellCountX];
 
             for (int z = 0, i = 0; z < _cellCountZ; z++) {
-                for (int x = 0; x < _cellCountX; x++) {
+                for (var x = 0; x < _cellCountX; x++) {
                     CreateCell(x, z, i++);
                 }
             }
@@ -111,11 +111,11 @@ namespace Terrain
         }
 
         public HexCell GetCell(HexCoordinates coordinates) {
-            int z = coordinates.Z;
+            var z = coordinates.Z;
             if (z < 0 || z >= _cellCountZ) {
                 return null;
             }
-            int x = coordinates.X + z / 2;
+            var x = coordinates.X + z / 2;
             if (x < 0 || x >= _cellCountX) {
                 return null;
             }
