@@ -9,9 +9,10 @@ namespace Terrain
         public HexGrid hexGrid;
 
         private Color _activeColor;
-        private int _activeElevation;
+        private int _activeElevation, _activeWaterLevel;
         private bool _applyColor;
-        private bool _applyElevation = true;
+        private bool _applyElevation;
+        private bool _applyWaterLevel;
         private int _brushSize;
         private OptionalToggle _riverMode, _roadMode;
         private bool _isDrag;
@@ -75,6 +76,10 @@ namespace Terrain
 
             if (_applyElevation) {
                 cell.Elevation = _activeElevation;
+            }
+
+            if (_applyWaterLevel) {
+                cell.WaterLevel = _activeWaterLevel;
             }
 
             if (_riverMode == OptionalToggle.No) {
@@ -145,6 +150,14 @@ namespace Terrain
 
         public void setRoadMode(int mode) {
             _roadMode = (OptionalToggle) mode;
+        }
+
+        public void SetApplyWaterLevel(bool toggle) {
+            _applyWaterLevel = toggle;
+        }
+
+        public void SetWaterLevel(float level) {
+            _activeWaterLevel = (int) level;
         }
     }
 

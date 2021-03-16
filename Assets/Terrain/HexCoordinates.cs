@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Terrain
 {
-    [System.Serializable]
+    [Serializable]
     public struct HexCoordinates
     {
         [SerializeField] private int x, z;

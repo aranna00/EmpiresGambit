@@ -17,7 +17,7 @@ namespace Terrain
         public bool HasRiver => _hasIncomingRiver || _hasOutgoingRiver;
         public bool HasRiverBeginOrEnd => _hasIncomingRiver != _hasOutgoingRiver;
 
-        public float StreamBedY => (_elevation + HexMetrics.StreamBedElevationOffset) * HexMetrics.ElevationsStep;
+        public float StreamBedY => (_elevation + HexMetrics.StreamBedElevationOffset) * HexMetrics.ElevationStep;
 
         public HexDirection RiverBeginOrEndDirection => _hasIncomingRiver ? _incomingRiver : _outGoingRiver;
 
@@ -37,7 +37,7 @@ namespace Terrain
 
                 _elevation = value;
                 var position = transform.localPosition;
-                position.y = value * HexMetrics.ElevationsStep;
+                position.y = value * HexMetrics.ElevationStep;
                 position.y += (HexMetrics.SampleNoise(position).y * 2f - 1f) * HexMetrics.ElevationPerturbStrength;
                 transform.localPosition = position;
 
@@ -63,9 +63,23 @@ namespace Terrain
             }
         }
 
-        public float RiverSurfaceY => (_elevation + HexMetrics.RiverSurfaceElevationOffset) * HexMetrics.ElevationsStep;
-
+        public float RiverSurfaceY => (_elevation + HexMetrics.WaterElevationOffset) * HexMetrics.ElevationStep;
         public bool HasRoads => roads.Any(road => road);
+
+        public int WaterLevel {
+            get => _waterLevel;
+            set {
+                if (_waterLevel == value) {
+                    return;
+                }
+
+                _waterLevel = value;
+                Refresh();
+            }
+        }
+
+        public float WaterSurfaceY => (_waterLevel + HexMetrics.WaterElevationOffset) * HexMetrics.ElevationStep;
+        public bool IsUnderwater => _waterLevel > _elevation;
 
         [SerializeField] private HexCell[] neighbors;
         private int _elevation = int.MinValue;
@@ -75,6 +89,7 @@ namespace Terrain
         private HexDirection _incomingRiver;
         private HexDirection _outGoingRiver;
         [SerializeField] private bool[] roads;
+        private int _waterLevel;
 
         public void SetNeighbor(HexDirection direction, HexCell cell) {
             neighbors[(int) direction] = cell;
@@ -164,7 +179,8 @@ namespace Terrain
         }
 
         public void AddRoad(HexDirection direction) {
-            if (!roads[(int) direction] && !HasRiverThroughEdge(direction) && GetElevationDifference(direction) <= HexMetrics.MaxSlopeHeight) {
+            if (!roads[(int) direction] && !HasRiverThroughEdge(direction) &&
+                GetElevationDifference(direction) <= HexMetrics.MaxSlopeHeight) {
                 SetRoad((int) direction, true);
             }
         }
@@ -190,7 +206,7 @@ namespace Terrain
         }
 
         public bool HasRoadThroughEdge(HexDirection direction) {
-            return roads[(int)direction];
+            return roads[(int) direction];
         }
     }
 }

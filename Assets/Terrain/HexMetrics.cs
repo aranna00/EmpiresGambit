@@ -9,7 +9,7 @@ namespace Terrain
         public const float InnerRadius = OuterRadius * OuterToInner;
         public const float SolidFactor = 0.8f;
         public const float BlendFactor = 1f - SolidFactor;
-        public const float ElevationsStep = 3f;
+        public const float ElevationStep = 3f;
         public const int TerracesPerSlope = 2;
         public const int TerraceSteps = TerracesPerSlope * 2 + 1;
         public const float HorizontalTerraceStepSize = 1f / TerraceSteps;
@@ -21,8 +21,10 @@ namespace Terrain
         public const float StreamBedElevationOffset = -1.75f;
         public const float OuterToInner = .866025404f;
         public const float InnerToOuter = 1f / OuterToInner;
-        public const float RiverSurfaceElevationOffset = -.5f;
+        public const float WaterElevationOffset = -.5f;
         public const int MaxSlopeHeight = 1;
+        public const float WaterFactor = 0.6f;
+        public const float waterBlendFactor = 1f - WaterFactor;
 
         public static Texture2D NoiseSource;
 
@@ -98,6 +100,18 @@ namespace Terrain
             position.z += (sample.z * 2f - 1f) * CellPerturbStrength;
 
             return position;
+        }
+
+        public static Vector3 GetFirstWaterCorner(HexDirection direction) {
+            return Corners[(int) direction] * WaterFactor;
+        }
+
+        public static Vector3 GetSecondWaterCorner(HexDirection direction) {
+            return Corners[(int) direction + 1] * WaterFactor;
+        }
+
+        public static Vector3 GetWaterBridge(HexDirection direction) {
+            return (Corners[(int) direction] + Corners[(int) direction + 1]) * waterBlendFactor;
         }
     }
 }
