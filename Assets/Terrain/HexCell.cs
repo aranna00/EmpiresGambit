@@ -13,13 +13,13 @@ namespace Terrain
         public bool HasIncomingRiver => _hasIncomingRiver;
         public bool HasOutgoingRiver => _hasOutgoingRiver;
         public HexDirection IncomingRiver => _incomingRiver;
-        public HexDirection OutGoingRiver => _outGoingRiver;
+        public HexDirection OutgoingRiver => _outgoingRiver;
         public bool HasRiver => _hasIncomingRiver || _hasOutgoingRiver;
         public bool HasRiverBeginOrEnd => _hasIncomingRiver != _hasOutgoingRiver;
 
         public float StreamBedY => (_elevation + HexMetrics.StreamBedElevationOffset) * HexMetrics.ElevationStep;
 
-        public HexDirection RiverBeginOrEndDirection => _hasIncomingRiver ? _incomingRiver : _outGoingRiver;
+        public HexDirection RiverBeginOrEndDirection => _hasIncomingRiver ? _incomingRiver : _outgoingRiver;
 
         public Color Color {
             get => _color;
@@ -45,13 +45,7 @@ namespace Terrain
                 uiPosition.z = -position.y;
                 uiRect.localPosition = uiPosition;
 
-                if (_hasOutgoingRiver && _elevation < GetNeighbor(_outGoingRiver)._elevation) {
-                    RemoveOutGoingRiver();
-                }
-
-                if (_hasIncomingRiver && _elevation > GetNeighbor(_incomingRiver)._elevation) {
-                    RemoveIncomingRiver();
-                }
+                ValidateRivers();
 
                 for (var i = 0; i < roads.Length; i++) {
                     if (roads[i] && GetElevationDifference((HexDirection) i) > HexMetrics.MaxSlopeHeight) {
@@ -74,6 +68,7 @@ namespace Terrain
                 }
 
                 _waterLevel = value;
+                ValidateRivers();
                 Refresh();
             }
         }
@@ -87,7 +82,7 @@ namespace Terrain
         private bool _hasIncomingRiver;
         private bool _hasOutgoingRiver;
         private HexDirection _incomingRiver;
-        private HexDirection _outGoingRiver;
+        private HexDirection _outgoingRiver;
         [SerializeField] private bool[] roads;
         private int _waterLevel;
 
@@ -121,16 +116,16 @@ namespace Terrain
 
         public bool HasRiverThroughEdge(HexDirection direction) {
             return _hasIncomingRiver && _incomingRiver == direction ||
-                   HasOutgoingRiver && _outGoingRiver == direction;
+                   HasOutgoingRiver && _outgoingRiver == direction;
         }
 
-        public void RemoveOutGoingRiver() {
+        public void RemoveOutgoingRiver() {
             if (!_hasOutgoingRiver) return;
 
             _hasOutgoingRiver = false;
             RefreshSelfOnly();
 
-            var neighbor = GetNeighbor(_outGoingRiver);
+            var neighbor = GetNeighbor(_outgoingRiver);
             neighbor._hasIncomingRiver = false;
             neighbor.RefreshSelfOnly();
         }
@@ -148,7 +143,7 @@ namespace Terrain
 
         public void RemoveRiver() {
             RemoveIncomingRiver();
-            RemoveOutGoingRiver();
+            RemoveOutgoingRiver();
         }
 
         private void RefreshSelfOnly() {
@@ -156,18 +151,18 @@ namespace Terrain
         }
 
         public void SetOutgoingRiver(HexDirection direction) {
-            if (_hasOutgoingRiver && _outGoingRiver == direction) return;
+            if (_hasOutgoingRiver && _outgoingRiver == direction) return;
 
             var neighbor = GetNeighbor(direction);
-            if (!neighbor || _elevation < neighbor._elevation) return;
+            if (!IsValidRiverDestination(neighbor)) return;
 
-            RemoveOutGoingRiver();
+            RemoveOutgoingRiver();
             if (_hasIncomingRiver && _incomingRiver == direction) {
                 RemoveIncomingRiver();
             }
 
             _hasOutgoingRiver = true;
-            _outGoingRiver = direction;
+            _outgoingRiver = direction;
 
 
             neighbor.RemoveIncomingRiver();
@@ -207,6 +202,25 @@ namespace Terrain
 
         public bool HasRoadThroughEdge(HexDirection direction) {
             return roads[(int) direction];
+        }
+
+        private bool IsValidRiverDestination(HexCell neighbor) {
+            return neighbor && (_elevation >= neighbor._elevation || _waterLevel == neighbor._elevation);
+        }
+
+        void ValidateRivers () {
+            if (
+                _hasOutgoingRiver &&
+                !IsValidRiverDestination(GetNeighbor(_outgoingRiver))
+            ) {
+                RemoveOutgoingRiver();
+            }
+            if (
+                _hasIncomingRiver &&
+                !GetNeighbor(_incomingRiver).IsValidRiverDestination(this)
+            ) {
+                RemoveIncomingRiver();
+            }
         }
     }
 }

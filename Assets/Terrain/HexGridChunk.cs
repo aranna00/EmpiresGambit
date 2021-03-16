@@ -595,7 +595,7 @@ namespace Terrain
             if (cell.HasRiverBeginOrEnd) {
                 roadCenter += HexMetrics.GetSolidEdgeMiddle(cell.RiverBeginOrEndDirection.Opposite()) * (1f / 3f);
             }
-            else if (cell.IncomingRiver == cell.OutGoingRiver.Opposite()) {
+            else if (cell.IncomingRiver == cell.OutgoingRiver.Opposite()) {
                 Vector3 corner;
                 if (previousHasRiver) {
                     if (!hasRoadThroughEdge && !cell.HasRoadThroughEdge(direction.Next())) return;
@@ -609,10 +609,10 @@ namespace Terrain
                 roadCenter += corner * .5f;
                 center += corner * .25f;
             }
-            else if (cell.IncomingRiver == cell.OutGoingRiver.Previous()) {
+            else if (cell.IncomingRiver == cell.OutgoingRiver.Previous()) {
                 roadCenter -= HexMetrics.GetSecondCorner(cell.IncomingRiver) * .2f;
             }
-            else if (cell.IncomingRiver == cell.OutGoingRiver.Next()) {
+            else if (cell.IncomingRiver == cell.OutgoingRiver.Next()) {
                 roadCenter -= HexMetrics.GetFirstCorner(cell.IncomingRiver) * .2f;
             }
             else if (previousHasRiver && nextHasRiver) {
@@ -688,7 +688,7 @@ namespace Terrain
             );
 
             if (cell.HasRiverThroughEdge(direction)) {
-                TriangulateEstuary(e1, e2);
+                TriangulateEstuary(e1, e2, cell.IncomingRiver == direction);
             }
             else {
                 waterShores.AddQuad(e1.v1, e1.v2, e2.v1, e2.v2);
@@ -717,7 +717,7 @@ namespace Terrain
             }
         }
 
-        private void TriangulateEstuary(EdgeVertices e1, EdgeVertices e2) {
+        private void TriangulateEstuary(EdgeVertices e1, EdgeVertices e2, bool incomingRiver) {
             waterShores.AddTriangle(e2.v1, e1.v2, e1.v1);
             waterShores.AddTriangle(e2.v5, e1.v5, e1.v4);
             waterShores.AddTriangleUV(new Vector2(0f, 1f), new Vector2(0f, 0f), new Vector2(0f, 0f));
@@ -731,9 +731,36 @@ namespace Terrain
             estuaries.AddTriangleUV(new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(1f, 1f));
             estuaries.AddQuadUV(new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(1f, 1f), new Vector2(0f, 1f));
 
-            estuaries.AddQuadUV2(new Vector2(1.5f, 1f), new Vector2(0.7f, 1.15f), new Vector2(1f, 0.8f), new Vector2(0.5f, 1.1f));
-            estuaries.AddTriangleUV2(new Vector2(0.5f, 1.1f), new Vector2(1f, 0.8f), new Vector2(0f, 0.8f));
-            estuaries.AddQuadUV2(new Vector2(0.5f, 1.1f), new Vector2(0.3f, 1.15f), new Vector2(0f, 0.8f), new Vector2(-0.5f, 1f));
+            if (incomingRiver) {
+                estuaries.AddQuadUV2(
+                    new Vector2(1.5f, 1f),
+                    new Vector2(0.7f, 1.15f),
+                    new Vector2(1f, 0.8f),
+                    new Vector2(0.5f, 1.1f)
+                );
+                estuaries.AddTriangleUV2(new Vector2(0.5f, 1.1f), new Vector2(1f, 0.8f), new Vector2(0f, 0.8f));
+                estuaries.AddQuadUV2(
+                    new Vector2(0.5f, 1.1f),
+                    new Vector2(0.3f, 1.15f),
+                    new Vector2(0f, 0.8f),
+                    new Vector2(-0.5f, 1f)
+                );
+            }
+            else {
+                estuaries.AddQuadUV2(
+                    new Vector2(-0.5f, -0.2f),
+                    new Vector2(0.3f, -0.35f),
+                    new Vector2(0f, 0f),
+                    new Vector2(0.5f, -0.3f)
+                );
+                estuaries.AddTriangleUV2(new Vector2(0.5f, -0.3f), new Vector2(0f, 0f), new Vector2(1f, 0f));
+                estuaries.AddQuadUV2(
+                    new Vector2(0.5f, -0.3f),
+                    new Vector2(0.7f, -0.35f),
+                    new Vector2(1f, 0f),
+                    new Vector2(1.5f, -0.2f)
+                );
+            }
         }
 
         private void TriangulateOpenWater(HexDirection direction, HexCell cell, HexCell neighbor, Vector3 center) {
