@@ -10,22 +10,23 @@ namespace Terrain
 
         private Color _activeColor;
         private int _activeElevation, _activeWaterLevel;
+        private int _activeUrbanLevel;
         private bool _applyColor;
         private bool _applyElevation;
+        private bool _applyUrbanLevel;
         private bool _applyWaterLevel;
         private int _brushSize;
-        private OptionalToggle _riverMode, _roadMode;
-        private bool _isDrag;
         private HexDirection _dragDirection;
+        private bool _isDrag;
         private HexCell _previousCell;
+        private OptionalToggle _riverMode, _roadMode;
 
         private void Awake() {
             SelectColor(0);
         }
 
         private void Update() {
-            if (Input.GetMouseButton(0) &&
-                !EventSystem.current.IsPointerOverGameObject()) {
+            if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject()) {
                 HandleInput();
             }
             else {
@@ -53,11 +54,7 @@ namespace Terrain
         }
 
         private void ValidateDrag(HexCell currentCell) {
-            for (
-                _dragDirection = HexDirection.NE;
-                _dragDirection <= HexDirection.NW;
-                _dragDirection++
-            ) {
+            for (_dragDirection = HexDirection.NE; _dragDirection <= HexDirection.NW; _dragDirection++) {
                 if (_previousCell.GetNeighbor(_dragDirection) == currentCell) {
                     _isDrag = true;
                     return;
@@ -82,6 +79,10 @@ namespace Terrain
                 cell.WaterLevel = _activeWaterLevel;
             }
 
+            if (_applyUrbanLevel) {
+                cell.UrbanLevel = _activeUrbanLevel;
+            }
+
             if (_riverMode == OptionalToggle.No) {
                 cell.RemoveRiver();
             }
@@ -93,7 +94,7 @@ namespace Terrain
             else if (_isDrag) {
                 var otherCell = cell.GetNeighbor(_dragDirection.Opposite());
                 if (!otherCell) return;
-                
+
                 if (_riverMode == OptionalToggle.Yes) {
                     otherCell.SetOutgoingRiver(_dragDirection);
                 }
@@ -158,6 +159,14 @@ namespace Terrain
 
         public void SetWaterLevel(float level) {
             _activeWaterLevel = (int) level;
+        }
+
+        public void SetApplyUrbanLevel(bool toggle) {
+            _applyUrbanLevel = toggle;
+        }
+
+        public void SetUrbanLevel(float level) {
+            _activeUrbanLevel = (int) level;
         }
     }
 

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Terrain
 {
@@ -25,8 +26,16 @@ namespace Terrain
         public const int MaxSlopeHeight = 1;
         public const float WaterFactor = 0.6f;
         public const float waterBlendFactor = 1f - WaterFactor;
+        public const int HashGridSize = 256;
+        public const float HashGridScale = 0.25f;
 
         public static Texture2D NoiseSource;
+
+        private static HexHash[] _hashGrid;
+
+        static float[][] _featureThresholds = {
+            new float[] {0.0f, 0.0f, 0.4f}, new float[] {0.0f, 0.4f, 0.6f}, new float[] {0.4f, 0.6f, 0.8f}
+        };
 
         public static readonly Vector3[] Corners = {
             new Vector3(0f, 0f, OuterRadius),
@@ -112,6 +121,27 @@ namespace Terrain
 
         public static Vector3 GetWaterBridge(HexDirection direction) {
             return (Corners[(int) direction] + Corners[(int) direction + 1]) * waterBlendFactor;
+        }
+
+        public static void InitializeHashGrid(int seed) {
+            _hashGrid = new HexHash[HashGridSize * HashGridSize];
+            var currentState = Random.state;
+            Random.InitState(seed);
+            for (var i = 0; i < _hashGrid.Length; i++) {
+                _hashGrid[i] = HexHash.Create();
+            }
+
+            Random.state = currentState;
+        }
+
+        public static HexHash SampleHashGrid(Vector3 position) {
+            var x = Math.Abs((int) (position.x * HashGridScale) % HashGridSize);
+            var z = Math.Abs((int) (position.z * HashGridScale) % HashGridSize);
+            return _hashGrid[x + z * HashGridSize];
+        }
+
+        public static float[] GetFeatureThresholds(int level) {
+            return _featureThresholds[level];
         }
     }
 }

@@ -7,6 +7,7 @@ namespace Terrain
     public class HexGridChunk : MonoBehaviour
     {
         public HexMesh terrain, rivers, roads, water, waterShores, estuaries;
+        public HexFeatureManager features;
 
         private HexCell[] _cells;
         private Canvas _gridCanvas;
@@ -16,6 +17,11 @@ namespace Terrain
 
             _cells = new HexCell[HexMetrics.ChunkSizeX * HexMetrics.ChunkSizeZ];
             ShowUI(false);
+        }
+
+        private void LateUpdate() {
+            Triangulate(_cells);
+            enabled = false;
         }
 
         public void AddCell(int index, HexCell cell) {
@@ -29,11 +35,6 @@ namespace Terrain
             enabled = true;
         }
 
-        private void LateUpdate() {
-            Triangulate(_cells);
-            enabled = false;
-        }
-
         public void ShowUI(bool visible) {
             _gridCanvas.gameObject.SetActive(visible);
         }
@@ -45,6 +46,7 @@ namespace Terrain
             water.Clear();
             waterShores.Clear();
             estuaries.Clear();
+            features.Clear();
 
             foreach (var cell in cells) {
                 Triangulate(cell);
@@ -56,11 +58,16 @@ namespace Terrain
             water.Apply();
             waterShores.Apply();
             estuaries.Apply();
+            features.Apply();
         }
 
         private void Triangulate(HexCell cell) {
             foreach (var direction in (HexDirection[]) Enum.GetValues(typeof(HexDirection))) {
                 Triangulate(direction, cell);
+            }
+
+            if (!cell.IsUnderwater && !cell.HasRiver && !cell.HasRoads) {
+                features.AddFeature(cell, cell.Position);
             }
         }
 
@@ -87,6 +94,10 @@ namespace Terrain
             }
             else {
                 TriangulateWithoutRiver(direction, cell, center, e);
+
+                if (!cell.IsUnderwater && !cell.HasRoadThroughEdge(direction)) {
+                    features.AddFeature(cell, (center + e.v1 + e.v5) * (1f / 3f));
+                }
             }
 
             if (direction <= HexDirection.SE) {
@@ -163,7 +174,7 @@ namespace Terrain
                 }
             }
 
-            if (cell.GETEdgeType(direction) == HexEdgeType.Slope) {
+            if (cell.GetEdgeType(direction) == HexEdgeType.Slope) {
                 TriangulateEdgeTerraces(e1, cell, e2, neighbor, cell.HasRoadThroughEdge(direction));
             }
             else {
@@ -496,6 +507,10 @@ namespace Terrain
 
             TriangulateEdgeStrip(m, cell.Color, e, cell.Color);
             TriangulateEdgeFan(center, m, cell.Color);
+
+            if (!cell.IsUnderwater && !cell.HasRiverThroughEdge(direction)) {
+                features.AddFeature(cell, (center + e.v1 + e.v5) * (1f / 3f));
+            }
         }
 
         private void TriangulateRiverQuad(

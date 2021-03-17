@@ -9,6 +9,17 @@ namespace Terrain
         public HexCoordinates coordinates;
         public RectTransform uiRect;
         public HexGridChunk chunk;
+
+        [SerializeField] private HexCell[] neighbors;
+        [SerializeField] private bool[] roads;
+        private Color _color;
+        private int _elevation = int.MinValue;
+        private bool _hasIncomingRiver;
+        private bool _hasOutgoingRiver;
+        private HexDirection _incomingRiver;
+        private HexDirection _outgoingRiver;
+        private int _urbanLevel;
+        private int _waterLevel;
         public Vector3 Position => transform.localPosition;
         public bool HasIncomingRiver => _hasIncomingRiver;
         public bool HasOutgoingRiver => _hasOutgoingRiver;
@@ -76,15 +87,14 @@ namespace Terrain
         public float WaterSurfaceY => (_waterLevel + HexMetrics.WaterElevationOffset) * HexMetrics.ElevationStep;
         public bool IsUnderwater => _waterLevel > _elevation;
 
-        [SerializeField] private HexCell[] neighbors;
-        private int _elevation = int.MinValue;
-        private Color _color;
-        private bool _hasIncomingRiver;
-        private bool _hasOutgoingRiver;
-        private HexDirection _incomingRiver;
-        private HexDirection _outgoingRiver;
-        [SerializeField] private bool[] roads;
-        private int _waterLevel;
+        public int UrbanLevel {
+            get => _urbanLevel;
+            set {
+                if (_urbanLevel == value) return;
+                _urbanLevel = value;
+                RefreshSelfOnly();
+            }
+        }
 
         public void SetNeighbor(HexDirection direction, HexCell cell) {
             neighbors[(int) direction] = cell;
@@ -95,7 +105,7 @@ namespace Terrain
             return neighbors[(int) direction];
         }
 
-        public HexEdgeType GETEdgeType(HexDirection direction) {
+        public HexEdgeType GetEdgeType(HexDirection direction) {
             return HexMetrics.GetEdgeType(_elevation, neighbors[(int) direction].Elevation);
         }
 
@@ -115,8 +125,7 @@ namespace Terrain
         }
 
         public bool HasRiverThroughEdge(HexDirection direction) {
-            return _hasIncomingRiver && _incomingRiver == direction ||
-                   HasOutgoingRiver && _outgoingRiver == direction;
+            return _hasIncomingRiver && _incomingRiver == direction || HasOutgoingRiver && _outgoingRiver == direction;
         }
 
         public void RemoveOutgoingRiver() {
@@ -174,8 +183,9 @@ namespace Terrain
         }
 
         public void AddRoad(HexDirection direction) {
-            if (!roads[(int) direction] && !HasRiverThroughEdge(direction) &&
-                GetElevationDifference(direction) <= HexMetrics.MaxSlopeHeight) {
+            if (!roads[(int) direction]
+                && !HasRiverThroughEdge(direction)
+                && GetElevationDifference(direction) <= HexMetrics.MaxSlopeHeight) {
                 SetRoad((int) direction, true);
             }
         }
@@ -208,17 +218,12 @@ namespace Terrain
             return neighbor && (_elevation >= neighbor._elevation || _waterLevel == neighbor._elevation);
         }
 
-        void ValidateRivers () {
-            if (
-                _hasOutgoingRiver &&
-                !IsValidRiverDestination(GetNeighbor(_outgoingRiver))
-            ) {
+        private void ValidateRivers() {
+            if (_hasOutgoingRiver && !IsValidRiverDestination(GetNeighbor(_outgoingRiver))) {
                 RemoveOutgoingRiver();
             }
-            if (
-                _hasIncomingRiver &&
-                !GetNeighbor(_incomingRiver).IsValidRiverDestination(this)
-            ) {
+
+            if (_hasIncomingRiver && !GetNeighbor(_incomingRiver).IsValidRiverDestination(this)) {
                 RemoveIncomingRiver();
             }
         }

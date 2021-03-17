@@ -11,14 +11,16 @@ namespace Terrain
         public Text cellLabelPrefab;
         public HexGridChunk chunkPrefab;
         public Texture2D noiseSource;
-
-        private HexCell[] _cells;
+        public int seed;
         private int _cellCountX;
         private int _cellCountZ;
+
+        private HexCell[] _cells;
         private HexGridChunk[] _chunks;
 
         private void Awake() {
             HexMetrics.NoiseSource = noiseSource;
+            HexMetrics.InitializeHashGrid(seed);
 
             _cellCountX = chunkCountX * HexMetrics.ChunkSizeX;
             _cellCountZ = chunkCountZ * HexMetrics.ChunkSizeZ;
@@ -28,7 +30,9 @@ namespace Terrain
         }
 
         private void OnEnable() {
+            if (HexMetrics.NoiseSource) return;
             HexMetrics.NoiseSource = noiseSource;
+            HexMetrics.InitializeHashGrid(seed);
         }
 
         private void CreateCell(int x, int z, int i) {
@@ -67,6 +71,7 @@ namespace Terrain
 
             cell.uiRect = label.rectTransform;
             cell.Elevation = 0;
+
 
             AddCellToChunk(x, z, cell);
         }
@@ -107,7 +112,8 @@ namespace Terrain
 
             var localX = x - chunkX * HexMetrics.ChunkSizeX;
             var localZ = z - chunkZ * HexMetrics.ChunkSizeZ;
-            chunk.AddCell(localX + localZ * HexMetrics.ChunkSizeX, cell);
+            var pos = localX + localZ * HexMetrics.ChunkSizeX;
+            chunk.AddCell(pos, cell);
         }
 
         public HexCell GetCell(HexCoordinates coordinates) {
@@ -115,10 +121,12 @@ namespace Terrain
             if (z < 0 || z >= _cellCountZ) {
                 return null;
             }
+
             var x = coordinates.X + z / 2;
             if (x < 0 || x >= _cellCountX) {
                 return null;
             }
+
             return _cells[x + z * _cellCountX];
         }
 

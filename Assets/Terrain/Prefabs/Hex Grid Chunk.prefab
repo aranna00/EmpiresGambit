@@ -606,6 +606,7 @@ Transform:
   - {fileID: 2943864943062018491}
   - {fileID: 3811095123848605373}
   - {fileID: 5278962847343881826}
+  - {fileID: 2064481126302278084}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -627,6 +628,7 @@ MonoBehaviour:
   water: {fileID: 2490003202731148326}
   waterShores: {fileID: 9178331638497956155}
   estuaries: {fileID: 2979149182853234426}
+  features: {fileID: 2655869786260936227}
 --- !u!1 &6612413934525165761
 GameObject:
   m_ObjectHideFlags: 0
@@ -725,3 +727,56 @@ MonoBehaviour:
   useColor: 0
   useUVCoordinates: 1
   useUV2Coordinates: 0
+--- !u!1 &8981733931928242557
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2064481126302278084}
+  - component: {fileID: 2655869786260936227}
+  m_Layer: 0
+  m_Name: Features
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2064481126302278084
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8981733931928242557}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8488744410890229305}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2655869786260936227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8981733931928242557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c3cdbf7b7044fe9a5162a30c12dca19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  urbanCollections:
+  - Prefabs:
+    - {fileID: 2525855598276166520, guid: 055bfd79fd146ee42a29ab2111cfbe7c, type: 3}
+    - {fileID: 2525855598276166520, guid: 02b67c5a96d6e8a40861ca6bc5e572f4, type: 3}
+  - Prefabs:
+    - {fileID: 2525855598276166520, guid: dc9ae630363be5949b4d8b47c595e12a, type: 3}
+    - {fileID: 2525855598276166520, guid: 93cceb3dd83863141a3fb61590b241d2, type: 3}
+  - Prefabs:
+    - {fileID: 2525855598276166520, guid: c89ea5bacd612de41837e43d623c7f67, type: 3}
+    - {fileID: 2525855598276166520, guid: 35e5dffefbbb3004f965a4f6137422ec, type: 3}
