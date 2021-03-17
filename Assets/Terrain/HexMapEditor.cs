@@ -10,10 +10,10 @@ namespace Terrain
 
         private Color _activeColor;
         private int _activeElevation, _activeWaterLevel;
-        private int _activeUrbanLevel;
+        private int _activeUrbanLevel, _activeFarmLevel, _activePlantLevel;
         private bool _applyColor;
         private bool _applyElevation;
-        private bool _applyUrbanLevel;
+        private bool _applyUrbanLevel, _applyFarmLevel, _applyPlantLevel;
         private bool _applyWaterLevel;
         private int _brushSize;
         private HexDirection _dragDirection;
@@ -81,6 +81,14 @@ namespace Terrain
 
             if (_applyUrbanLevel) {
                 cell.UrbanLevel = _activeUrbanLevel;
+            }
+
+            if (_applyPlantLevel) {
+                cell.PlantLevel = _activePlantLevel;
+            }
+
+            if (_applyFarmLevel) {
+                cell.FarmLevel = _activeFarmLevel;
             }
 
             if (_riverMode == OptionalToggle.No) {
@@ -167,6 +175,23 @@ namespace Terrain
 
         public void SetUrbanLevel(float level) {
             _activeUrbanLevel = (int) level;
+        }
+
+
+        public void SetApplyFarmLevel(bool toggle) {
+            _applyFarmLevel = toggle;
+        }
+
+        public void SetFarmLevel(float level) {
+            _activeFarmLevel = (int) level;
+        }
+
+        public void SetApplyPlantLevel(bool toggle) {
+            _applyPlantLevel = toggle;
+        }
+
+        public void SetPlantLevel(float level) {
+            _activePlantLevel = (int) level;
         }
     }
 

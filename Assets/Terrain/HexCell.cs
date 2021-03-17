@@ -18,7 +18,7 @@ namespace Terrain
         private bool _hasOutgoingRiver;
         private HexDirection _incomingRiver;
         private HexDirection _outgoingRiver;
-        private int _urbanLevel;
+        private int _urbanLevel, _farmLevel, _plantLevel;
         private int _waterLevel;
         public Vector3 Position => transform.localPosition;
         public bool HasIncomingRiver => _hasIncomingRiver;
@@ -92,6 +92,24 @@ namespace Terrain
             set {
                 if (_urbanLevel == value) return;
                 _urbanLevel = value;
+                RefreshSelfOnly();
+            }
+        }
+
+        public int FarmLevel {
+            get => _farmLevel;
+            set {
+                if (_farmLevel == value) return;
+                _farmLevel = value;
+                RefreshSelfOnly();
+            }
+        }
+
+        public int PlantLevel {
+            get => _plantLevel;
+            set {
+                if (_plantLevel == value) return;
+                _plantLevel = value;
                 RefreshSelfOnly();
             }
         }
