@@ -28,6 +28,9 @@ namespace Terrain
         public const float waterBlendFactor = 1f - WaterFactor;
         public const int HashGridSize = 256;
         public const float HashGridScale = 0.25f;
+        public const float WallHeight = 3f;
+        public const float WallThickness = 0.75f;
+        public const float WallElevationOffset = VerticalTerraceStepSize;
 
         public static Texture2D NoiseSource;
 
@@ -142,6 +145,26 @@ namespace Terrain
 
         public static float[] GetFeatureThresholds(int level) {
             return _featureThresholds[level];
+        }
+
+        public static Vector3 WallThicknessOffset(Vector3 near, Vector3 far) {
+            Vector3 offset;
+
+            offset.x = far.x - near.x;
+            offset.y = 0;
+            offset.z = far.z - near.z;
+
+            return offset.normalized * (WallThickness * 0.5f);
+        }
+
+        public static Vector3 WallLerp(Vector3 near, Vector3 far) {
+            near.x += (far.x - near.x) * 0.5f;
+            near.z += (far.z - near.z) * 0.5f;
+
+            var v = near.y < far.y ? WallElevationOffset : 1f - WallElevationOffset;
+            near.y += (far.y - near.y) * v;
+
+            return near;
         }
     }
 }

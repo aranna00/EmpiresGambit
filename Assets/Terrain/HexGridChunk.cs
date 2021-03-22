@@ -8,7 +8,6 @@ namespace Terrain
     {
         public HexMesh terrain, rivers, roads, water, waterShores, estuaries;
         public HexFeatureManager features;
-
         private HexCell[] _cells;
         private Canvas _gridCanvas;
 
@@ -132,7 +131,10 @@ namespace Terrain
             bridge.y = neighbor.Position.y - cell.Position.y;
             var e2 = new EdgeVertices(e1.v1 + bridge, e1.v5 + bridge);
 
-            if (cell.HasRiverThroughEdge(direction)) {
+            var hasRiver = cell.HasRiverThroughEdge(direction);
+            var hasRoad = cell.HasRoadThroughEdge(direction);
+
+            if (hasRiver) {
                 e2.v3.y = neighbor.StreamBedY;
 
                 if (!cell.IsUnderwater) {
@@ -175,11 +177,13 @@ namespace Terrain
             }
 
             if (cell.GetEdgeType(direction) == HexEdgeType.Slope) {
-                TriangulateEdgeTerraces(e1, cell, e2, neighbor, cell.HasRoadThroughEdge(direction));
+                TriangulateEdgeTerraces(e1, cell, e2, neighbor, hasRoad);
             }
             else {
-                TriangulateEdgeStrip(e1, cell.Color, e2, neighbor.Color, cell.HasRoadThroughEdge(direction));
+                TriangulateEdgeStrip(e1, cell.Color, e2, neighbor.Color, hasRoad);
             }
+
+            features.AddWall(e1, cell, e2, neighbor, hasRiver, hasRoad);
 
             var nextNeighbor = cell.GetNeighbor(direction.Next());
             if (direction <= HexDirection.E && nextNeighbor != null) {
@@ -245,6 +249,8 @@ namespace Terrain
                 terrain.AddTriangle(bottom, left, right);
                 terrain.AddTriangleColor(bottomCell.Color, leftCell.Color, rightCell.Color);
             }
+
+            features.AddWall(bottom, bottomCell, left, leftCell, right, rightCell);
         }
 
         private void TriangulateCornerTerracesCliff(

@@ -19,6 +19,7 @@ namespace Terrain
         private HexDirection _incomingRiver;
         private HexDirection _outgoingRiver;
         private int _urbanLevel, _farmLevel, _plantLevel;
+        private bool _walled;
         private int _waterLevel;
         public Vector3 Position => transform.localPosition;
         public bool HasIncomingRiver => _hasIncomingRiver;
@@ -111,6 +112,16 @@ namespace Terrain
                 if (_plantLevel == value) return;
                 _plantLevel = value;
                 RefreshSelfOnly();
+            }
+        }
+
+        public bool Walled {
+            get => _walled;
+            set {
+                if (_walled != value) {
+                    _walled = value;
+                    Refresh();
+                }
             }
         }
 

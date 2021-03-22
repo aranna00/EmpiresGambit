@@ -19,7 +19,7 @@ namespace Terrain
         private HexDirection _dragDirection;
         private bool _isDrag;
         private HexCell _previousCell;
-        private OptionalToggle _riverMode, _roadMode;
+        private OptionalToggle _riverMode, _roadMode, _walledMode;
 
         private void Awake() {
             SelectColor(0);
@@ -97,6 +97,10 @@ namespace Terrain
 
             if (_roadMode == OptionalToggle.No) {
                 cell.RemoveRoads();
+            }
+
+            if (_walledMode != OptionalToggle.Ignore) {
+                cell.Walled = _walledMode == OptionalToggle.Yes;
             }
 
             else if (_isDrag) {
@@ -192,6 +196,10 @@ namespace Terrain
 
         public void SetPlantLevel(float level) {
             _activePlantLevel = (int) level;
+        }
+
+        public void SetWalledMode(int mode) {
+            _walledMode = (OptionalToggle) mode;
         }
     }
 
