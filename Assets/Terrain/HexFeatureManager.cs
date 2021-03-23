@@ -6,6 +6,7 @@ namespace Terrain
     {
         public HexMesh walls;
         public HexFeatureCollection[] urbanCollections, farmCollections, plantCollections;
+        public Transform wallTower;
 
         private Transform _container;
 
@@ -125,7 +126,13 @@ namespace Terrain
             }
         }
 
-        private void AddWallSegment(Vector3 nearLeft, Vector3 farLeft, Vector3 nearRight, Vector3 farRight) {
+        private void AddWallSegment(
+            Vector3 nearLeft,
+            Vector3 farLeft,
+            Vector3 nearRight,
+            Vector3 farRight,
+            bool addTower = false
+        ) {
             nearLeft = HexMetrics.Perturb(nearLeft);
             farLeft = HexMetrics.Perturb(farLeft);
             nearRight = HexMetrics.Perturb(nearRight);
@@ -156,6 +163,15 @@ namespace Terrain
             walls.AddQuadUnperturbed(v2, v1, v4, v3);
 
             walls.AddQuadUnperturbed(t1, t2, v3, v4);
+
+            if (addTower) {
+                var towerInstance = Instantiate(wallTower, _container, false);
+                towerInstance.transform.localPosition = (left + right) * 0.5f;
+                towerInstance.transform.localPosition = towerInstance.transform.localPosition + new Vector3(0, 2, 0);
+                var rightDirection = right - left;
+                rightDirection.y = 0f;
+                towerInstance.transform.right = rightDirection;
+            }
         }
 
         private void AddWallSegment(
@@ -173,7 +189,13 @@ namespace Terrain
 
             if (hasLeftWall) {
                 if (hasRightWall) {
-                    AddWallSegment(pivot, left, pivot, right);
+                    var hasTower = false;
+                    if (leftCell.Elevation == rightCell.Elevation) {
+                        var hash = HexMetrics.SampleHashGrid((pivot + left + right) * (1f / 3f));
+                        hasTower = hash.e < HexMetrics.WallTowerThreshold;
+                    }
+
+                    AddWallSegment(pivot, left, pivot, right, hasTower);
                 }
                 else if (leftCell.Elevation < rightCell.Elevation) {
                     AddWallWedge(pivot, left, right);

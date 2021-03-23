@@ -900,3 +900,4 @@ MonoBehaviour:
   - Prefabs:
     - {fileID: 8430902784580876247, guid: 62761f3e5fca8694e9aa65f3b1af4955, type: 3}
     - {fileID: 8430902784580876247, guid: 74cab2c03dfcc8f479e66c9299a39268, type: 3}
+  wallTower: {fileID: 9063981615953137917, guid: 8980550ac20191949b0f9a56c97ce9d6, type: 3}

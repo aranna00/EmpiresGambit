@@ -5377,8 +5377,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d381b1676f434c8689a46ff66486d7ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkCountX: 4
-  chunkCountZ: 3
+  chunkCountX: 8
+  chunkCountZ: 6
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
   cellPrefab: {fileID: 2110708594470274852, guid: d159a370fb1625946b7e340a10434d39, type: 3}
   cellLabelPrefab: {fileID: 8944549544077748094, guid: 5a1453049ac837b49a1c8cee905600df, type: 3}
