@@ -10,10 +10,10 @@ namespace Terrain
 
         private Color _activeColor;
         private int _activeElevation, _activeWaterLevel;
-        private int _activeUrbanLevel, _activeFarmLevel, _activePlantLevel;
+        private int _activeUrbanLevel, _activeFarmLevel, _activePlantLevel, _activeSpecialIndex;
         private bool _applyColor;
         private bool _applyElevation;
-        private bool _applyUrbanLevel, _applyFarmLevel, _applyPlantLevel;
+        private bool _applyUrbanLevel, _applyFarmLevel, _applyPlantLevel, _applySpecialIndex;
         private bool _applyWaterLevel;
         private int _brushSize;
         private HexDirection _dragDirection;
@@ -77,6 +77,10 @@ namespace Terrain
 
             if (_applyWaterLevel) {
                 cell.WaterLevel = _activeWaterLevel;
+            }
+
+            if (_applySpecialIndex) {
+                cell.SpecialIndex = _activeSpecialIndex;
             }
 
             if (_applyUrbanLevel) {
@@ -200,6 +204,14 @@ namespace Terrain
 
         public void SetWalledMode(int mode) {
             _walledMode = (OptionalToggle) mode;
+        }
+
+        public void SetApplySpecialIndex(bool toggle) {
+            _applySpecialIndex = toggle;
+        }
+
+        public void SetSpecialIndex(float index) {
+            _activeSpecialIndex = (int) index;
         }
     }
 

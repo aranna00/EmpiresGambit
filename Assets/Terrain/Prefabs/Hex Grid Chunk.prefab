@@ -902,3 +902,7 @@ MonoBehaviour:
     - {fileID: 8430902784580876247, guid: 74cab2c03dfcc8f479e66c9299a39268, type: 3}
   wallTower: {fileID: 9063981615953137917, guid: 8980550ac20191949b0f9a56c97ce9d6, type: 3}
   bridge: {fileID: 4340525048900709656, guid: b2d078e6a76031c46bf51337e1e1cc2f, type: 3}
+  special:
+  - {fileID: 6141476291395308212, guid: d75e4dff87d82dd4286761e4749673cc, type: 3}
+  - {fileID: 6434133722574523112, guid: 5766f9fc601355b40ad416feee95311e, type: 3}
+  - {fileID: 6593697287290558130, guid: b26bebeecb6a9324ca8a3200129d315d, type: 3}

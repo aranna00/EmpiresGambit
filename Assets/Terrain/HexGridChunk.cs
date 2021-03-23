@@ -65,8 +65,14 @@ namespace Terrain
                 Triangulate(direction, cell);
             }
 
-            if (!cell.IsUnderwater && !cell.HasRiver && !cell.HasRoads) {
-                features.AddFeature(cell, cell.Position);
+            if (!cell.IsUnderwater) {
+                if (!cell.HasRiver && !cell.HasRoads) {
+                    features.AddFeature(cell, cell.Position);
+                }
+
+                if (cell.IsSpecial) {
+                    features.AddSpecialFeature(cell, cell.Position);
+                }
             }
         }
 

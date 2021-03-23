@@ -7,6 +7,7 @@ namespace Terrain
         public HexMesh walls;
         public HexFeatureCollection[] urbanCollections, farmCollections, plantCollections;
         public Transform wallTower, bridge;
+        public Transform[] special;
 
         private Transform _container;
 
@@ -25,6 +26,7 @@ namespace Terrain
         }
 
         public void AddFeature(HexCell cell, Vector3 position) {
+            if (cell.IsSpecial) return;
             var hash = HexMetrics.SampleHashGrid(position);
             var prefab = PickPrefab(urbanCollections, cell.UrbanLevel, hash.a, hash.d);
             var otherPrefab = PickPrefab(farmCollections, cell.FarmLevel, hash.b, hash.d);
@@ -167,7 +169,6 @@ namespace Terrain
             if (addTower) {
                 var towerInstance = Instantiate(wallTower, _container, false);
                 towerInstance.transform.localPosition = (left + right) * 0.5f;
-                towerInstance.transform.localPosition = towerInstance.transform.localPosition + new Vector3(0, 2, 0);
                 var rightDirection = right - left;
                 rightDirection.y = 0f;
                 towerInstance.transform.right = rightDirection;
@@ -259,6 +260,13 @@ namespace Terrain
             instance.localPosition = (roadCenter1 + roadCenter2) * 0.5f;
             var length = Vector3.Distance(roadCenter1, roadCenter2);
             instance.localScale = new Vector3(1f, 1f, length * (1f / HexMetrics.BridgeDesignLength));
+        }
+
+        public void AddSpecialFeature(HexCell cell, Vector3 position) {
+            var instance = Instantiate(special[cell.SpecialIndex - 1], _container, false);
+            instance.localPosition = HexMetrics.Perturb(position);
+            var hash = HexMetrics.SampleHashGrid(position);
+            instance.localRotation = Quaternion.Euler(0f, 360f * hash.e, 0f);
         }
     }
 }

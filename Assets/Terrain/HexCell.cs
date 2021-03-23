@@ -18,6 +18,7 @@ namespace Terrain
         private bool _hasOutgoingRiver;
         private HexDirection _incomingRiver;
         private HexDirection _outgoingRiver;
+        private int _specialIndex;
         private int _urbanLevel, _farmLevel, _plantLevel;
         private bool _walled;
         private int _waterLevel;
@@ -125,6 +126,19 @@ namespace Terrain
             }
         }
 
+        public int SpecialIndex {
+            get => _specialIndex;
+            set {
+                if (_specialIndex != value && !HasRiver) {
+                    _specialIndex = value;
+                    RemoveRoads();
+                    RefreshSelfOnly();
+                }
+            }
+        }
+
+        public bool IsSpecial => _specialIndex > 0;
+
         public void SetNeighbor(HexDirection direction, HexCell cell) {
             neighbors[(int) direction] = cell;
             cell.neighbors[(int) direction.Opposite()] = this;
@@ -201,11 +215,13 @@ namespace Terrain
 
             _hasOutgoingRiver = true;
             _outgoingRiver = direction;
+            _specialIndex = 0;
 
 
             neighbor.RemoveIncomingRiver();
             neighbor._hasIncomingRiver = true;
             neighbor._incomingRiver = direction.Opposite();
+            neighbor.SpecialIndex = 0;
 
 
             SetRoad((int) direction, false);
@@ -214,6 +230,8 @@ namespace Terrain
         public void AddRoad(HexDirection direction) {
             if (!roads[(int) direction]
                 && !HasRiverThroughEdge(direction)
+                && !IsSpecial
+                && !GetNeighbor(direction).IsSpecial
                 && GetElevationDifference(direction) <= HexMetrics.MaxSlopeHeight) {
                 SetRoad((int) direction, true);
             }
