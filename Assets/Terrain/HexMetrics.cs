@@ -35,9 +35,11 @@ namespace Terrain
         public const float WallYOffset = -1f;
         public const float BridgeDesignLength = 7f;
 
-        public static Texture2D NoiseSource;
+        public static Texture2D noiseSource;
+        public static Color[] colors;
 
         private static HexHash[] _hashGrid;
+
 
         static float[][] _featureThresholds = {
             new float[] {0.0f, 0.0f, 0.4f}, new float[] {0.0f, 0.4f, 0.6f}, new float[] {0.4f, 0.6f, 0.8f}
@@ -101,7 +103,7 @@ namespace Terrain
         }
 
         public static Vector4 SampleNoise(Vector3 position) {
-            return NoiseSource.GetPixelBilinear(position.x * NoiseScale, position.z * NoiseScale);
+            return noiseSource.GetPixelBilinear(position.x * NoiseScale, position.z * NoiseScale);
         }
 
         public static Vector3 GetSolidEdgeMiddle(HexDirection direction) {

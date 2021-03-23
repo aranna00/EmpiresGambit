@@ -5,13 +5,11 @@ namespace Terrain
 {
     public class HexMapEditor : MonoBehaviour
     {
-        public Color[] colors;
         public HexGrid hexGrid;
 
-        private Color _activeColor;
         private int _activeElevation, _activeWaterLevel;
+        private int _activeTerrainTypeIndex;
         private int _activeUrbanLevel, _activeFarmLevel, _activePlantLevel, _activeSpecialIndex;
-        private bool _applyColor;
         private bool _applyElevation;
         private bool _applyUrbanLevel, _applyFarmLevel, _applyPlantLevel, _applySpecialIndex;
         private bool _applyWaterLevel;
@@ -21,9 +19,6 @@ namespace Terrain
         private HexCell _previousCell;
         private OptionalToggle _riverMode, _roadMode, _walledMode;
 
-        private void Awake() {
-            SelectColor(0);
-        }
 
         private void Update() {
             if (Input.GetMouseButton(0) && !EventSystem.current.IsPointerOverGameObject()) {
@@ -66,9 +61,8 @@ namespace Terrain
 
         private void EditCell(HexCell cell) {
             if (!cell) return;
-
-            if (_applyColor) {
-                cell.Color = _activeColor;
+            if (_activeTerrainTypeIndex >= 0) {
+                cell.TerrainTypeIndex = _activeTerrainTypeIndex;
             }
 
             if (_applyElevation) {
@@ -118,13 +112,6 @@ namespace Terrain
                 if (_roadMode == OptionalToggle.Yes) {
                     otherCell.AddRoad(_dragDirection);
                 }
-            }
-        }
-
-        public void SelectColor(int index) {
-            _applyColor = index >= 0;
-            if (_applyColor) {
-                _activeColor = colors[index];
             }
         }
 
@@ -212,6 +199,10 @@ namespace Terrain
 
         public void SetSpecialIndex(float index) {
             _activeSpecialIndex = (int) index;
+        }
+
+        public void SetTerrainTypeIndex(int index) {
+            _activeTerrainTypeIndex = index;
         }
     }
 

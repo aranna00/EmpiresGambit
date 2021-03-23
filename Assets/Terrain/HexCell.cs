@@ -12,13 +12,13 @@ namespace Terrain
 
         [SerializeField] private HexCell[] neighbors;
         [SerializeField] private bool[] roads;
-        private Color _color;
         private int _elevation = int.MinValue;
         private bool _hasIncomingRiver;
         private bool _hasOutgoingRiver;
         private HexDirection _incomingRiver;
         private HexDirection _outgoingRiver;
         private int _specialIndex;
+        private int _terrainTypeIndex;
         private int _urbanLevel, _farmLevel, _plantLevel;
         private bool _walled;
         private int _waterLevel;
@@ -34,12 +34,15 @@ namespace Terrain
 
         public HexDirection RiverBeginOrEndDirection => _hasIncomingRiver ? _incomingRiver : _outgoingRiver;
 
-        public Color Color {
-            get => _color;
+        public Color Color => HexMetrics.colors[_terrainTypeIndex];
+
+        public int TerrainTypeIndex {
+            get => _terrainTypeIndex;
             set {
-                if (_color == value) return;
-                _color = value;
-                Refresh();
+                if (_terrainTypeIndex != value) {
+                    _terrainTypeIndex = value;
+                    Refresh();
+                }
             }
         }
 

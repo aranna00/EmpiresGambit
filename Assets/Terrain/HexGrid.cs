@@ -6,12 +6,14 @@ namespace Terrain
     public class HexGrid : MonoBehaviour
     {
         public int chunkCountX = 4, chunkCountZ = 3;
-        public Color defaultColor = Color.white;
         public HexCell cellPrefab;
         public Text cellLabelPrefab;
         public HexGridChunk chunkPrefab;
         public Texture2D noiseSource;
         public int seed;
+        public Color[] colors;
+
+
         private int _cellCountX;
         private int _cellCountZ;
 
@@ -19,8 +21,9 @@ namespace Terrain
         private HexGridChunk[] _chunks;
 
         private void Awake() {
-            HexMetrics.NoiseSource = noiseSource;
+            HexMetrics.noiseSource = noiseSource;
             HexMetrics.InitializeHashGrid(seed);
+            HexMetrics.colors = colors;
 
             _cellCountX = chunkCountX * HexMetrics.ChunkSizeX;
             _cellCountZ = chunkCountZ * HexMetrics.ChunkSizeZ;
@@ -30,9 +33,10 @@ namespace Terrain
         }
 
         private void OnEnable() {
-            if (HexMetrics.NoiseSource) return;
-            HexMetrics.NoiseSource = noiseSource;
+            if (HexMetrics.noiseSource) return;
+            HexMetrics.noiseSource = noiseSource;
             HexMetrics.InitializeHashGrid(seed);
+            HexMetrics.colors = colors;
         }
 
         private void CreateCell(int x, int z, int i) {
@@ -44,7 +48,6 @@ namespace Terrain
             var cell = _cells[i] = Instantiate(cellPrefab);
             cell.transform.localPosition = position;
             cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-            cell.Color = defaultColor;
 
             if (x > 0) {
                 cell.SetNeighbor(HexDirection.W, _cells[i - 1]);

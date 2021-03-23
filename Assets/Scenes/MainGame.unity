@@ -1138,7 +1138,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1298737277}
         m_TargetAssemblyTypeName: Terrain.HexMapEditor, Assembly-CSharp
-        m_MethodName: SelectColor
+        m_MethodName: SetTerrainTypeIndex
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2739,7 +2739,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1298737277}
         m_TargetAssemblyTypeName: Terrain.HexMapEditor, Assembly-CSharp
-        m_MethodName: SelectColor
+        m_MethodName: SetTerrainTypeIndex
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4539,7 +4539,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1298737277}
         m_TargetAssemblyTypeName: Terrain.HexMapEditor, Assembly-CSharp
-        m_MethodName: SelectColor
+        m_MethodName: SetTerrainTypeIndex
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4961,7 +4961,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1298737277}
         m_TargetAssemblyTypeName: Terrain.HexMapEditor, Assembly-CSharp
-        m_MethodName: SelectColor
+        m_MethodName: SetTerrainTypeIndex
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5607,12 +5607,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chunkCountX: 8
   chunkCountZ: 6
-  defaultColor: {r: 1, g: 1, b: 1, a: 1}
   cellPrefab: {fileID: 2110708594470274852, guid: d159a370fb1625946b7e340a10434d39, type: 3}
   cellLabelPrefab: {fileID: 8944549544077748094, guid: 5a1453049ac837b49a1c8cee905600df, type: 3}
   chunkPrefab: {fileID: 2587470350081291854, guid: b0ac29ab4b6f62240b0a7dc261e16646, type: 3}
   noiseSource: {fileID: 2800000, guid: 10456e0db53545218ba775e5f8cbf284, type: 3}
   seed: 1234
+  colors:
+  - {r: 1, g: 1, b: 1, a: 0}
+  - {r: 0.003921569, g: 0.68235296, b: 0.03137255, a: 0}
+  - {r: 0.07450981, g: 0.21960786, b: 0.83921576, a: 0}
+  - {r: 0.9960785, g: 0.3019608, b: 0.10196079, a: 0}
+  - {r: 0.9960785, g: 0.8588236, b: 0, a: 0}
 --- !u!4 &1031548387
 Transform:
   m_ObjectHideFlags: 0
@@ -6287,7 +6292,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1298737277}
         m_TargetAssemblyTypeName: Terrain.HexMapEditor, Assembly-CSharp
-        m_MethodName: SelectColor
+        m_MethodName: SetTerrainTypeIndex
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6809,12 +6814,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6e8136805c94f10a609227e349a4d3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colors:
-  - {r: 1, g: 1, b: 1, a: 0}
-  - {r: 0.003921569, g: 0.68235296, b: 0.03137255, a: 0}
-  - {r: 0.07058824, g: 0.21568629, b: 0.8352942, a: 0}
-  - {r: 1, g: 0.30588236, b: 0.10588236, a: 0}
-  - {r: 1, g: 0.86274517, b: 0, a: 0}
   hexGrid: {fileID: 1031548386}
 --- !u!114 &1298737278
 MonoBehaviour:
@@ -11347,7 +11346,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1298737277}
         m_TargetAssemblyTypeName: Terrain.HexMapEditor, Assembly-CSharp
-        m_MethodName: SelectColor
+        m_MethodName: SetTerrainTypeIndex
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
