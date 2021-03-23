@@ -6,7 +6,7 @@ namespace Terrain
     {
         public HexMesh walls;
         public HexFeatureCollection[] urbanCollections, farmCollections, plantCollections;
-        public Transform wallTower;
+        public Transform wallTower, bridge;
 
         private Transform _container;
 
@@ -249,6 +249,16 @@ namespace Terrain
             walls.AddQuadUnperturbed(v1, point, v3, pointTop);
             walls.AddQuadUnperturbed(point, v2, pointTop, v4);
             walls.AddTriangleUnperturbed(pointTop, v3, v4);
+        }
+
+        public void AddBridge(Vector3 roadCenter1, Vector3 roadCenter2) {
+            roadCenter1 = HexMetrics.Perturb(roadCenter1);
+            roadCenter2 = HexMetrics.Perturb(roadCenter2);
+            var instance = Instantiate(bridge, _container, false);
+            instance.forward = roadCenter2 - roadCenter1;
+            instance.localPosition = (roadCenter1 + roadCenter2) * 0.5f;
+            var length = Vector3.Distance(roadCenter1, roadCenter2);
+            instance.localScale = new Vector3(1f, 1f, length * (1f / HexMetrics.BridgeDesignLength));
         }
     }
 }

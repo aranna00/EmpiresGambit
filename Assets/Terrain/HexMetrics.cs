@@ -33,6 +33,7 @@ namespace Terrain
         public const float WallElevationOffset = VerticalTerraceStepSize;
         public const float WallTowerThreshold = 0.5f;
         public const float WallYOffset = -1f;
+        public const float BridgeDesignLength = 7f;
 
         public static Texture2D NoiseSource;
 
