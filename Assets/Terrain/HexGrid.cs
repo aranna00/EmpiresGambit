@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Terrain
@@ -136,6 +137,25 @@ namespace Terrain
         public void ShowUI(bool visible) {
             foreach (var chunk in _chunks) {
                 chunk.ShowUI(visible);
+            }
+        }
+
+        public void Save(BinaryWriter writer) {
+            for (var index = 0; index < _cells.Length; index++) {
+                var cell = _cells[index];
+                cell.Save(writer);
+            }
+        }
+
+        public void Load(BinaryReader reader) {
+            for (var index = 0; index < _cells.Length; index++) {
+                var cell = _cells[index];
+                cell.Load(reader);
+            }
+
+            for (var index = 0; index < _chunks.Length; index++) {
+                var gridChunk = _chunks[index];
+                gridChunk.Refresh();
             }
         }
     }

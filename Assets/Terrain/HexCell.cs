@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -50,16 +51,9 @@ namespace Terrain
             get => _elevation;
             set {
                 if (_elevation == value) return;
-
                 _elevation = value;
-                var position = transform.localPosition;
-                position.y = value * HexMetrics.ElevationStep;
-                position.y += (HexMetrics.SampleNoise(position).y * 2f - 1f) * HexMetrics.ElevationPerturbStrength;
-                transform.localPosition = position;
 
-                var uiPosition = uiRect.localPosition;
-                uiPosition.z = -position.y;
-                uiRect.localPosition = uiPosition;
+                RefreshPosition();
 
                 ValidateRivers();
 
@@ -276,6 +270,76 @@ namespace Terrain
             if (_hasIncomingRiver && !GetNeighbor(_incomingRiver).IsValidRiverDestination(this)) {
                 RemoveIncomingRiver();
             }
+        }
+
+        public void Save(BinaryWriter writer) {
+            writer.Write((byte) _terrainTypeIndex);
+            writer.Write((byte) _elevation);
+            writer.Write((byte) _waterLevel);
+            writer.Write((byte) _urbanLevel);
+            writer.Write((byte) _farmLevel);
+            writer.Write((byte) _plantLevel);
+            writer.Write((byte) _specialIndex);
+            writer.Write(_walled);
+
+            writer.Write((byte) (_hasIncomingRiver ? _incomingRiver + 128 : 0));
+            writer.Write((byte) (_hasOutgoingRiver ? _outgoingRiver + 128 : 0));
+
+            var roadFlags = 0;
+            for (var i = 0; i < roads.Length; i++) {
+                var road = roads[i];
+                if (road) {
+                    roadFlags |= 1 << i;
+                }
+            }
+
+            writer.Write((byte) roadFlags);
+        }
+
+        public void Load(BinaryReader reader) {
+            _terrainTypeIndex = reader.ReadByte();
+            _elevation = reader.ReadByte();
+            RefreshPosition();
+            _waterLevel = reader.ReadByte();
+            _urbanLevel = reader.ReadByte();
+            _farmLevel = reader.ReadByte();
+            _plantLevel = reader.ReadByte();
+            _specialIndex = reader.ReadByte();
+            _walled = reader.ReadBoolean();
+
+            var riverData = reader.ReadByte();
+            if (riverData >= 128) {
+                _hasIncomingRiver = true;
+                _incomingRiver = (HexDirection) (riverData - 128);
+            }
+            else {
+                _hasIncomingRiver = false;
+            }
+
+            riverData = reader.ReadByte();
+            if (riverData >= 128) {
+                _hasOutgoingRiver = true;
+                _outgoingRiver = (HexDirection) (riverData - 128);
+            }
+            else {
+                _hasOutgoingRiver = false;
+            }
+
+            var roadFlags = reader.ReadByte();
+            for (var i = 0; i < roads.Length; i++) {
+                roads[i] = (roadFlags & (1 << i)) != 0;
+            }
+        }
+
+        private void RefreshPosition() {
+            var position = transform.localPosition;
+            position.y = _elevation * HexMetrics.ElevationStep;
+            position.y += (HexMetrics.SampleNoise(position).y * 2f - 1f) * HexMetrics.ElevationPerturbStrength;
+            transform.localPosition = position;
+
+            var uiPosition = uiRect.localPosition;
+            uiPosition.z = -position.y;
+            uiRect.localPosition = uiPosition;
         }
     }
 }
