@@ -12,7 +12,6 @@ namespace Terrain
         public HexGridChunk chunkPrefab;
         public Texture2D noiseSource;
         public int seed;
-        public Color[] colors;
 
         private HexCell[] _cells;
 
@@ -24,7 +23,6 @@ namespace Terrain
         private void Awake() {
             HexMetrics.noiseSource = noiseSource;
             HexMetrics.InitializeHashGrid(seed);
-            HexMetrics.colors = colors;
 
             CreateMap(cellCountX, cellCountZ);
         }
@@ -33,7 +31,6 @@ namespace Terrain
             if (HexMetrics.noiseSource) return;
             HexMetrics.noiseSource = noiseSource;
             HexMetrics.InitializeHashGrid(seed);
-            HexMetrics.colors = colors;
         }
 
         public bool CreateMap(int x, int z) {

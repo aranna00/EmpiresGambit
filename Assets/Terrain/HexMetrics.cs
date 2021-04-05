@@ -36,7 +36,6 @@ namespace Terrain
         public const float BridgeDesignLength = 7f;
 
         public static Texture2D noiseSource;
-        public static Color[] colors;
 
         private static HexHash[] _hashGrid;
 

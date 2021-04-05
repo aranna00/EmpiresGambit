@@ -7,15 +7,15 @@ namespace Terrain
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class HexMesh : MonoBehaviour
     {
-        public bool useCollider, useColor, useUVCoordinates, useUV2Coordinates;
+        public bool useCollider, useColor, useUVCoordinates, useUV2Coordinates, useTerrainTypes;
+        [NonSerialized] private List<Color> _colors;
 
         private Mesh _hexMesh;
         private MeshCollider _meshCollider;
-        
-        [NonSerialized] private List<Vector3> _vertices;
         [NonSerialized] private List<int> _triangles;
-        [NonSerialized] private List<Color> _colors;
         [NonSerialized] private List<Vector2> _uvs, _uv2s;
+
+        [NonSerialized] private List<Vector3> _vertices, _terrainTypes;
 
         private void Awake() {
             GetComponent<MeshFilter>().mesh = _hexMesh = new Mesh();
@@ -30,6 +30,10 @@ namespace Terrain
         public void Clear() {
             _hexMesh.Clear();
             _vertices = ListPool<Vector3>.Get();
+            if (useTerrainTypes) {
+                _terrainTypes = ListPool<Vector3>.Get();
+            }
+
             _triangles = ListPool<int>.Get();
             if (useColor) {
                 _colors = ListPool<Color>.Get();
@@ -48,6 +52,11 @@ namespace Terrain
             {
                 _hexMesh.SetVertices(_vertices);
                 ListPool<Vector3>.Add(_vertices);
+                if (useTerrainTypes) {
+                    _hexMesh.SetUVs(2, _terrainTypes);
+                    ListPool<Vector3>.Add(_terrainTypes);
+                }
+
                 _hexMesh.SetTriangles(_triangles, 0);
                 ListPool<int>.Add(_triangles);
                 if (useColor) {
@@ -61,7 +70,7 @@ namespace Terrain
                 }
 
                 if (useUV2Coordinates) {
-                    _hexMesh.SetUVs(1,_uv2s);
+                    _hexMesh.SetUVs(1, _uv2s);
                     ListPool<Vector2>.Add(_uv2s);
                 }
 
@@ -148,8 +157,8 @@ namespace Terrain
             _uvs.Add(uv2);
             _uvs.Add(uv3);
         }
-	
-        public void AddQuadUV (Vector2 uv1, Vector2 uv2, Vector3 uv3, Vector3 uv4) {
+
+        public void AddQuadUV(Vector2 uv1, Vector2 uv2, Vector3 uv3, Vector3 uv4) {
             _uvs.Add(uv1);
             _uvs.Add(uv2);
             _uvs.Add(uv3);
@@ -157,10 +166,10 @@ namespace Terrain
         }
 
         public void AddQuadUV(float uMin, float uMax, float vMin, float vMax) {
-            _uvs.Add(new Vector2(uMin,vMin));
-            _uvs.Add(new Vector2(uMax,vMin));
-            _uvs.Add(new Vector2(uMin,vMax));
-            _uvs.Add(new Vector2(uMax,vMax));
+            _uvs.Add(new Vector2(uMin, vMin));
+            _uvs.Add(new Vector2(uMax, vMin));
+            _uvs.Add(new Vector2(uMin, vMax));
+            _uvs.Add(new Vector2(uMax, vMax));
         }
 
         public void AddTriangleUV2(Vector2 uv1, Vector2 uv2, Vector2 uv3) {
@@ -168,8 +177,8 @@ namespace Terrain
             _uv2s.Add(uv2);
             _uv2s.Add(uv3);
         }
-	
-        public void AddQuadUV2 (Vector2 uv1, Vector2 uv2, Vector3 uv3, Vector3 uv4) {
+
+        public void AddQuadUV2(Vector2 uv1, Vector2 uv2, Vector3 uv3, Vector3 uv4) {
             _uv2s.Add(uv1);
             _uv2s.Add(uv2);
             _uv2s.Add(uv3);
@@ -177,14 +186,13 @@ namespace Terrain
         }
 
         public void AddQuadUV2(float uMin, float uMax, float vMin, float vMax) {
-            _uv2s.Add(new Vector2(uMin,vMin));
-            _uv2s.Add(new Vector2(uMax,vMin));
-            _uv2s.Add(new Vector2(uMin,vMax));
-            _uv2s.Add(new Vector2(uMax,vMax));
+            _uv2s.Add(new Vector2(uMin, vMin));
+            _uv2s.Add(new Vector2(uMax, vMin));
+            _uv2s.Add(new Vector2(uMin, vMax));
+            _uv2s.Add(new Vector2(uMax, vMax));
         }
 
         public void AddQuadUnperturbed(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4) {
-            
             var vertexIndex = _vertices.Count;
             _vertices.Add(v1);
             _vertices.Add(v2);
@@ -196,6 +204,19 @@ namespace Terrain
             _triangles.Add(vertexIndex + 1);
             _triangles.Add(vertexIndex + 2);
             _triangles.Add(vertexIndex + 3);
+        }
+
+        public void AddTriangleTerrainTypes(Vector3 types) {
+            _terrainTypes.Add(types);
+            _terrainTypes.Add(types);
+            _terrainTypes.Add(types);
+        }
+
+        public void AddQuadTerrainTypes(Vector3 types) {
+            _terrainTypes.Add(types);
+            _terrainTypes.Add(types);
+            _terrainTypes.Add(types);
+            _terrainTypes.Add(types);
         }
     }
 }

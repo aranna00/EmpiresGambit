@@ -35,8 +35,6 @@ namespace Terrain
 
         public HexDirection RiverBeginOrEndDirection => _hasIncomingRiver ? _incomingRiver : _outgoingRiver;
 
-        public Color Color => HexMetrics.colors[_terrainTypeIndex];
-
         public int TerrainTypeIndex {
             get => _terrainTypeIndex;
             set {
