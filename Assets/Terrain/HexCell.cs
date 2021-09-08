@@ -353,7 +353,7 @@ namespace Terrain
 
         private void UpdateDistanceLabel() {
             var label = uiRect.GetComponent<Text>();
-            label.text = _distance.ToString();
+            label.text = _distance == int.MaxValue ? "" : _distance.ToString();
         }
     }
 }
