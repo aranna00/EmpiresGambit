@@ -6,6 +6,7 @@ namespace Terrain
     public class HexMapEditor : MonoBehaviour
     {
         public HexGrid hexGrid;
+        public Material terrainMaterial;
 
         private int _activeElevation, _activeWaterLevel;
         private int _activeTerrainTypeIndex;
@@ -18,6 +19,10 @@ namespace Terrain
         private bool _isDrag;
         private HexCell _previousCell;
         private OptionalToggle _riverMode, _roadMode, _walledMode;
+
+        private void Awake() {
+            terrainMaterial.DisableKeyword("GRID_ON");
+        }
 
 
         private void Update() {
@@ -116,7 +121,7 @@ namespace Terrain
         }
 
         public void SetElevation(float elevation) {
-            _activeElevation = (int) elevation;
+            _activeElevation = (int)elevation;
         }
 
         public void SetApplyElevation(bool toggle) {
@@ -124,7 +129,7 @@ namespace Terrain
         }
 
         public void SetBrushSize(float size) {
-            _brushSize = (int) size;
+            _brushSize = (int)size;
         }
 
         private void EditCells(HexCell center) {
@@ -149,11 +154,11 @@ namespace Terrain
         }
 
         public void SetRiverMode(int mode) {
-            _riverMode = (OptionalToggle) mode;
+            _riverMode = (OptionalToggle)mode;
         }
 
         public void setRoadMode(int mode) {
-            _roadMode = (OptionalToggle) mode;
+            _roadMode = (OptionalToggle)mode;
         }
 
         public void SetApplyWaterLevel(bool toggle) {
@@ -161,7 +166,7 @@ namespace Terrain
         }
 
         public void SetWaterLevel(float level) {
-            _activeWaterLevel = (int) level;
+            _activeWaterLevel = (int)level;
         }
 
         public void SetApplyUrbanLevel(bool toggle) {
@@ -169,7 +174,7 @@ namespace Terrain
         }
 
         public void SetUrbanLevel(float level) {
-            _activeUrbanLevel = (int) level;
+            _activeUrbanLevel = (int)level;
         }
 
 
@@ -178,7 +183,7 @@ namespace Terrain
         }
 
         public void SetFarmLevel(float level) {
-            _activeFarmLevel = (int) level;
+            _activeFarmLevel = (int)level;
         }
 
         public void SetApplyPlantLevel(bool toggle) {
@@ -186,11 +191,11 @@ namespace Terrain
         }
 
         public void SetPlantLevel(float level) {
-            _activePlantLevel = (int) level;
+            _activePlantLevel = (int)level;
         }
 
         public void SetWalledMode(int mode) {
-            _walledMode = (OptionalToggle) mode;
+            _walledMode = (OptionalToggle)mode;
         }
 
         public void SetApplySpecialIndex(bool toggle) {
@@ -198,11 +203,20 @@ namespace Terrain
         }
 
         public void SetSpecialIndex(float index) {
-            _activeSpecialIndex = (int) index;
+            _activeSpecialIndex = (int)index;
         }
 
         public void SetTerrainTypeIndex(int index) {
             _activeTerrainTypeIndex = index;
+        }
+
+        public void ShowGrid(bool visible) {
+            if (visible) {
+                terrainMaterial.EnableKeyword("GRID_ON");
+            }
+            else {
+                terrainMaterial.DisableKeyword("GRID_ON");
+            }
         }
     }
 

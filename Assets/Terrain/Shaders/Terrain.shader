@@ -23,6 +23,8 @@ Shader "Custom/Terrain"
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.5
 
+        #pragma multi_compile _ GRID_ON
+
         UNITY_DECLARE_TEX2DARRAY(_MainTex);
 
         struct Input
@@ -64,10 +66,14 @@ Shader "Custom/Terrain"
                 GetTerrainColor(IN, 1) +
                 GetTerrainColor(IN, 2);
 
-            float2 gridUV = IN.worldPos.xz;
-            gridUV.x *= 1 / (4 * 8.66025404);
-            gridUV.y *= 1 / (2 * 15.0);
-            fixed4 grid = tex2D(_GridTex, gridUV);
+            fixed grid = 1;
+            #if defined(GRID_ON)
+                float2 gridUV = IN.worldPos.xz;
+                gridUV.x *= 1 / (4 * 8.66025404);
+                gridUV.y *= 1 / (2 * 15.0);
+                grid = tex2D(_GridTex, gridUV);
+            #endif
+
 
             o.Albedo = c.rgb * grid * _Color;
             // Metallic and smoothness come from slider variables
