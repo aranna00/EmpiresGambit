@@ -8,14 +8,24 @@ namespace Terrain
         public HexGrid hexGrid;
         public Material terrainMaterial;
 
-        private int _activeElevation, _activeWaterLevel;
-        private int _activeTerrainTypeIndex;
-        private int _activeUrbanLevel, _activeFarmLevel, _activePlantLevel, _activeSpecialIndex;
-        private bool _applyElevation;
-        private bool _applyUrbanLevel, _applyFarmLevel, _applyPlantLevel, _applySpecialIndex;
-        private bool _applyWaterLevel;
+        private int _activeElevation,
+            _activeWaterLevel,
+            _activeTerrainTypeIndex,
+            _activeUrbanLevel,
+            _activeFarmLevel,
+            _activePlantLevel,
+            _activeSpecialIndex;
+
+        private bool _applyElevation,
+            _applyUrbanLevel,
+            _applyFarmLevel,
+            _applyPlantLevel,
+            _applySpecialIndex,
+            _applyWaterLevel;
+
         private int _brushSize;
         private HexDirection _dragDirection;
+        private bool _editMode;
         private bool _isDrag;
         private HexCell _previousCell;
         private OptionalToggle _riverMode, _roadMode, _walledMode;
@@ -45,7 +55,13 @@ namespace Terrain
                     _isDrag = false;
                 }
 
-                EditCells(currentCell);
+                if (_editMode) {
+                    EditCells(currentCell);
+                }
+                else {
+                    hexGrid.FindDistanceTo(currentCell);
+                }
+
                 _previousCell = currentCell;
             }
             else {
@@ -149,10 +165,6 @@ namespace Terrain
             }
         }
 
-        public void ShowUI(bool visible) {
-            hexGrid.ShowUI(visible);
-        }
-
         public void SetRiverMode(int mode) {
             _riverMode = (OptionalToggle)mode;
         }
@@ -217,6 +229,11 @@ namespace Terrain
             else {
                 terrainMaterial.DisableKeyword("GRID_ON");
             }
+        }
+
+        public void SetEditMode(bool toggle) {
+            _editMode = toggle;
+            hexGrid.ShowUI(!toggle);
         }
     }
 

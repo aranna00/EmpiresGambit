@@ -86,7 +86,6 @@ namespace Terrain
 
             var label = Instantiate(cellLabelPrefab);
             label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
-            label.text = cell.coordinates.ToStringOnSeparateLines();
 
             cell.uiRect = label.rectTransform;
             cell.Elevation = 0;
@@ -181,6 +180,12 @@ namespace Terrain
 
             foreach (var gridChunk in _chunks) {
                 gridChunk.Refresh();
+            }
+        }
+
+        public void FindDistanceTo(HexCell cell) {
+            for (var i = 0; i < _cells.Length; i++) {
+                _cells[i].Distance = cell.coordinates.DistanceTo(_cells[i].coordinates);
             }
         }
     }

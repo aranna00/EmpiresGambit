@@ -19,7 +19,6 @@ namespace Terrain
             _gridCanvas = GetComponentInChildren<Canvas>();
 
             _cells = new HexCell[HexMetrics.ChunkSizeX * HexMetrics.ChunkSizeZ];
-            ShowUI(false);
         }
 
         private void LateUpdate() {
@@ -65,7 +64,7 @@ namespace Terrain
         }
 
         private void Triangulate(HexCell cell) {
-            foreach (var direction in (HexDirection[]) Enum.GetValues(typeof(HexDirection))) {
+            foreach (var direction in (HexDirection[])Enum.GetValues(typeof(HexDirection))) {
                 Triangulate(direction, cell);
             }
 

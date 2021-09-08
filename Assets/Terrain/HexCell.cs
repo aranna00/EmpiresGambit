@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Terrain
 {
@@ -13,6 +14,7 @@ namespace Terrain
 
         [SerializeField] private HexCell[] neighbors;
         [SerializeField] private bool[] roads;
+        private int _distance;
         private int _elevation = int.MinValue;
         private bool _hasIncomingRiver;
         private bool _hasOutgoingRiver;
@@ -23,6 +25,15 @@ namespace Terrain
         private int _urbanLevel, _farmLevel, _plantLevel;
         private bool _walled;
         private int _waterLevel;
+
+        public int Distance {
+            get => _distance;
+            set {
+                _distance = value;
+                UpdateDistanceLabel();
+            }
+        }
+
         public Vector3 Position => transform.localPosition;
         public bool HasIncomingRiver => _hasIncomingRiver;
         public bool HasOutgoingRiver => _hasOutgoingRiver;
@@ -56,7 +67,7 @@ namespace Terrain
                 ValidateRivers();
 
                 for (var i = 0; i < roads.Length; i++) {
-                    if (roads[i] && GetElevationDifference((HexDirection) i) > HexMetrics.MaxSlopeHeight) {
+                    if (roads[i] && GetElevationDifference((HexDirection)i) > HexMetrics.MaxSlopeHeight) {
                         SetRoad(i, false);
                     }
                 }
@@ -135,16 +146,16 @@ namespace Terrain
         public bool IsSpecial => _specialIndex > 0;
 
         public void SetNeighbor(HexDirection direction, HexCell cell) {
-            neighbors[(int) direction] = cell;
-            cell.neighbors[(int) direction.Opposite()] = this;
+            neighbors[(int)direction] = cell;
+            cell.neighbors[(int)direction.Opposite()] = this;
         }
 
         public HexCell GetNeighbor(HexDirection direction) {
-            return neighbors[(int) direction];
+            return neighbors[(int)direction];
         }
 
         public HexEdgeType GetEdgeType(HexDirection direction) {
-            return HexMetrics.GetEdgeType(_elevation, neighbors[(int) direction].Elevation);
+            return HexMetrics.GetEdgeType(_elevation, neighbors[(int)direction].Elevation);
         }
 
         public HexEdgeType GetEdgeType(HexCell otherCell) {
@@ -219,16 +230,16 @@ namespace Terrain
             neighbor.SpecialIndex = 0;
 
 
-            SetRoad((int) direction, false);
+            SetRoad((int)direction, false);
         }
 
         public void AddRoad(HexDirection direction) {
-            if (!roads[(int) direction]
+            if (!roads[(int)direction]
                 && !HasRiverThroughEdge(direction)
                 && !IsSpecial
                 && !GetNeighbor(direction).IsSpecial
                 && GetElevationDifference(direction) <= HexMetrics.MaxSlopeHeight) {
-                SetRoad((int) direction, true);
+                SetRoad((int)direction, true);
             }
         }
 
@@ -242,7 +253,7 @@ namespace Terrain
 
         public void SetRoad(int index, bool state) {
             roads[index] = state;
-            neighbors[index].roads[(int) ((HexDirection) index).Opposite()] = state;
+            neighbors[index].roads[(int)((HexDirection)index).Opposite()] = state;
             neighbors[index].RefreshSelfOnly();
             RefreshSelfOnly();
         }
@@ -253,7 +264,7 @@ namespace Terrain
         }
 
         public bool HasRoadThroughEdge(HexDirection direction) {
-            return roads[(int) direction];
+            return roads[(int)direction];
         }
 
         private bool IsValidRiverDestination(HexCell neighbor) {
@@ -271,17 +282,17 @@ namespace Terrain
         }
 
         public void Save(BinaryWriter writer) {
-            writer.Write((byte) _terrainTypeIndex);
-            writer.Write((byte) _elevation);
-            writer.Write((byte) _waterLevel);
-            writer.Write((byte) _urbanLevel);
-            writer.Write((byte) _farmLevel);
-            writer.Write((byte) _plantLevel);
-            writer.Write((byte) _specialIndex);
+            writer.Write((byte)_terrainTypeIndex);
+            writer.Write((byte)_elevation);
+            writer.Write((byte)_waterLevel);
+            writer.Write((byte)_urbanLevel);
+            writer.Write((byte)_farmLevel);
+            writer.Write((byte)_plantLevel);
+            writer.Write((byte)_specialIndex);
             writer.Write(_walled);
 
-            writer.Write((byte) (_hasIncomingRiver ? _incomingRiver + 128 : 0));
-            writer.Write((byte) (_hasOutgoingRiver ? _outgoingRiver + 128 : 0));
+            writer.Write((byte)(_hasIncomingRiver ? _incomingRiver + 128 : 0));
+            writer.Write((byte)(_hasOutgoingRiver ? _outgoingRiver + 128 : 0));
 
             var roadFlags = 0;
             for (var i = 0; i < roads.Length; i++) {
@@ -291,7 +302,7 @@ namespace Terrain
                 }
             }
 
-            writer.Write((byte) roadFlags);
+            writer.Write((byte)roadFlags);
         }
 
         public void Load(BinaryReader reader) {
@@ -308,7 +319,7 @@ namespace Terrain
             var riverData = reader.ReadByte();
             if (riverData >= 128) {
                 _hasIncomingRiver = true;
-                _incomingRiver = (HexDirection) (riverData - 128);
+                _incomingRiver = (HexDirection)(riverData - 128);
             }
             else {
                 _hasIncomingRiver = false;
@@ -317,7 +328,7 @@ namespace Terrain
             riverData = reader.ReadByte();
             if (riverData >= 128) {
                 _hasOutgoingRiver = true;
-                _outgoingRiver = (HexDirection) (riverData - 128);
+                _outgoingRiver = (HexDirection)(riverData - 128);
             }
             else {
                 _hasOutgoingRiver = false;
@@ -338,6 +349,11 @@ namespace Terrain
             var uiPosition = uiRect.localPosition;
             uiPosition.z = -position.y;
             uiRect.localPosition = uiPosition;
+        }
+
+        private void UpdateDistanceLabel() {
+            var label = uiRect.GetComponent<Text>();
+            label.text = _distance.ToString();
         }
     }
 }
