@@ -1,6 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.IO;
+using Lib;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +21,7 @@ namespace Terrain
         private int _chunkCountX;
         private int _chunkCountZ;
         private HexGridChunk[] _chunks;
+        private HexCellPriorityQueue _searchFrontier;
 
         private void Awake() {
             HexMetrics.noiseSource = noiseSource;
@@ -186,25 +187,45 @@ namespace Terrain
             }
         }
 
-        public void FindDistanceTo(HexCell cell) {
+        public void FindPath(HexCell fromCell, HexCell toCell) {
             StopAllCoroutines();
-            StartCoroutine(Search(cell));
+            StartCoroutine(Search(fromCell, toCell));
         }
 
-        private IEnumerator Search(HexCell cell) {
+        private IEnumerator Search(HexCell fromCell, HexCell toCell) {
+            if (_searchFrontier == null) {
+                _searchFrontier = new HexCellPriorityQueue();
+            }
+            else {
+                _searchFrontier.Clear();
+            }
+
             foreach (var hexCell in _cells) {
                 hexCell.Distance = int.MaxValue;
+                hexCell.DisableHighlight();
             }
+
+            fromCell.EnableHighlight(Color.blue);
+            toCell.EnableHighlight(Color.red);
 
             var delay = new WaitForSeconds(1 / 120f);
 
-            var frontier = new List<HexCell>();
-            cell.Distance = 0;
-            frontier.Add(cell);
-            while (frontier.Count > 0) {
+            fromCell.Distance = 0;
+            _searchFrontier.Enqueue(fromCell);
+            while (_searchFrontier.Count > 0) {
                 yield return delay;
-                var current = frontier[0];
-                frontier.RemoveAt(0);
+                var current = _searchFrontier.Dequeue();
+
+                if (current == toCell) {
+                    current = current.PathFrom;
+                    while (current != fromCell) {
+                        current.EnableHighlight(Color.white);
+                        current = current.PathFrom;
+                    }
+
+                    break;
+                }
+
                 for (var d = HexDirection.NE; d <= HexDirection.NW; d++) {
                     var neighbor = current.GetNeighbor(d);
                     if (neighbor == null) {
@@ -235,13 +256,16 @@ namespace Terrain
 
                     if (neighbor.Distance == int.MaxValue) {
                         neighbor.Distance = distance;
-                        frontier.Add(neighbor);
+                        neighbor.PathFrom = current;
+                        neighbor.SearchHeuristic = neighbor.coordinates.DistanceTo(toCell.coordinates);
+                        _searchFrontier.Enqueue(neighbor);
                     }
                     else if (distance < neighbor.Distance) {
+                        var oldPriority = neighbor.SearchPriority;
                         neighbor.Distance = distance;
+                        neighbor.PathFrom = current;
+                        _searchFrontier.Change(neighbor, oldPriority);
                     }
-
-                    frontier.Sort((x, y) => x.Distance.CompareTo(y.Distance));
                 }
             }
         }

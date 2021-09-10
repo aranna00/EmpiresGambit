@@ -27,7 +27,7 @@ namespace Terrain
         private HexDirection _dragDirection;
         private bool _editMode;
         private bool _isDrag;
-        private HexCell _previousCell;
+        private HexCell _previousCell, _searchFromCell, _searchToCell;
         private OptionalToggle _riverMode, _roadMode, _walledMode;
 
         private void Awake() {
@@ -58,8 +58,20 @@ namespace Terrain
                 if (_editMode) {
                     EditCells(currentCell);
                 }
-                else {
-                    hexGrid.FindDistanceTo(currentCell);
+                else if (Input.GetKey(KeyCode.LeftShift) && _searchToCell != currentCell) {
+                    if (_searchFromCell) {
+                        _searchFromCell.DisableHighlight();
+                    }
+
+                    _searchFromCell = currentCell;
+                    _searchFromCell.EnableHighlight(Color.blue);
+                    if (_searchToCell) {
+                        hexGrid.FindPath(_searchFromCell, _searchToCell);
+                    }
+                }
+                else if (_searchFromCell && _searchFromCell != currentCell) {
+                    _searchToCell = currentCell;
+                    hexGrid.FindPath(_searchFromCell, _searchToCell);
                 }
 
                 _previousCell = currentCell;

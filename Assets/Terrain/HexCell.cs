@@ -145,6 +145,11 @@ namespace Terrain
 
         public bool IsSpecial => _specialIndex > 0;
 
+        public HexCell PathFrom { get; set; }
+        public int SearchHeuristic { get; set; }
+        public HexCell NextWithSamePriority { get; set; }
+        public int SearchPriority => _distance + SearchHeuristic;
+
         public void SetNeighbor(HexDirection direction, HexCell cell) {
             neighbors[(int)direction] = cell;
             cell.neighbors[(int)direction.Opposite()] = this;
@@ -354,6 +359,17 @@ namespace Terrain
         private void UpdateDistanceLabel() {
             var label = uiRect.GetComponent<Text>();
             label.text = _distance == int.MaxValue ? "" : _distance.ToString();
+        }
+
+        public void DisableHighlight() {
+            var highlight = uiRect.GetChild(0).GetComponent<Image>();
+            highlight.enabled = false;
+        }
+
+        public void EnableHighlight(Color color) {
+            var highlight = uiRect.GetChild(0).GetComponent<Image>();
+            highlight.color = color;
+            highlight.enabled = true;
         }
     }
 }
